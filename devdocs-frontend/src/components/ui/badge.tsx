@@ -56,12 +56,12 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
 
     // Variant styles (matching SIMILARITY_COLORS from constants)
     const variantStyles = {
-      default: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
-      success: 'bg-green-50 text-green-700 hover:bg-green-100',
-      warning: 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100',
-      error: 'bg-red-50 text-red-700 hover:bg-red-100',
-      info: 'bg-blue-50 text-blue-700 hover:bg-blue-100',
-      outline: 'border border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50',
+      default: 'bg-gradient-to-r from-blue-500 to-violet-500 text-white shadow-lg shadow-blue-500/30',
+      success: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+      warning: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
+      error: 'bg-red-500/20 text-red-400 border border-red-500/30',
+      info: 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30',
+      outline: 'border border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800 hover:border-blue-500',
     };
 
     // Size styles

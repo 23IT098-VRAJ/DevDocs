@@ -59,7 +59,7 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('[API Request Error]', error);
+    // Suppress logging in request interceptor
     return Promise.reject(error);
   }
 );
@@ -127,11 +127,11 @@ apiClient.interceptors.response.use(
       errorMessage = error.message || 'Request failed';
     }
     
-    // Log error in development
-    if (process.env.NODE_ENV === 'development') {
+    // Log error in development (only log server errors, not network/connection errors)
+    if (process.env.NODE_ENV === 'development' && error.response) {
       console.error('[API Error]', {
         message: errorMessage,
-        status: error.response?.status,
+        status: error.response.status,
         url: error.config?.url,
       });
     }

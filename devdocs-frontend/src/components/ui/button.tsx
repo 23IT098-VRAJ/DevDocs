@@ -54,43 +54,45 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // Base styles applied to all buttons
     const baseStyles = cn(
       'inline-flex items-center justify-center gap-2',
-      'font-medium transition-colors duration-200',
+      'font-medium transition-all duration-200',
       'focus:outline-none focus:ring-2 focus:ring-offset-2',
       'disabled:opacity-50 disabled:cursor-not-allowed',
-      'rounded-lg'
+      'rounded-lg',
+      'hover:scale-105 active:scale-95',
+      'transform-gpu'
     );
 
     // Variant-specific styles
     const variantStyles = {
       primary: cn(
-        'bg-blue-600 text-white',
-        'hover:bg-blue-700',
-        'focus:ring-blue-500',
-        'disabled:hover:bg-blue-600'
+        'bg-gradient-to-r from-blue-500 to-violet-500 text-white shadow-lg shadow-blue-500/30',
+        'hover:from-blue-600 hover:to-violet-600 hover:shadow-2xl hover:shadow-blue-500/60 hover:-translate-y-0.5',
+        'focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900',
+        'disabled:hover:from-blue-500 disabled:hover:to-violet-500 disabled:shadow-lg disabled:hover:translate-y-0 disabled:hover:scale-100'
       ),
       secondary: cn(
-        'bg-gray-600 text-white',
-        'hover:bg-gray-700',
-        'focus:ring-gray-500',
-        'disabled:hover:bg-gray-600'
+        'bg-slate-700 text-slate-100 border border-slate-600',
+        'hover:bg-slate-600 hover:border-slate-500',
+        'focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900',
+        'disabled:hover:bg-slate-700'
       ),
       outline: cn(
-        'border-2 border-gray-300 bg-transparent text-gray-700',
-        'hover:bg-gray-50',
-        'focus:ring-gray-500',
-        'disabled:hover:bg-transparent'
+        'border-2 border-slate-600 bg-transparent text-slate-300',
+        'hover:bg-slate-800 hover:border-blue-500 hover:text-blue-400',
+        'focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900',
+        'disabled:hover:bg-transparent disabled:hover:border-slate-600'
       ),
       ghost: cn(
-        'bg-transparent text-gray-700',
-        'hover:bg-gray-100',
-        'focus:ring-gray-500',
+        'bg-transparent text-slate-300',
+        'hover:bg-slate-800 hover:text-blue-400',
+        'focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900',
         'disabled:hover:bg-transparent'
       ),
       destructive: cn(
-        'bg-red-600 text-white',
-        'hover:bg-red-700',
-        'focus:ring-red-500',
-        'disabled:hover:bg-red-600'
+        'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30',
+        'hover:from-red-600 hover:to-red-700 hover:shadow-xl hover:shadow-red-500/40',
+        'focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-slate-900',
+        'disabled:hover:from-red-500 disabled:hover:to-red-600'
       ),
     };
 

@@ -9,7 +9,7 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { searchApi } from '@/lib/api';
 import type { SearchResult } from '@/lib/types';
-import { SEARCH_CONFIG } from '@/lib/constants';
+import { SEARCH } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 
 // ============================================================================
@@ -86,9 +86,9 @@ interface UseSearchOptions {
  */
 export function useSearch({
   query,
-  limit = SEARCH_CONFIG.defaultLimit,
+  limit = SEARCH.DEFAULT_LIMIT,
   enabled = true,
-  debounceMs = SEARCH_CONFIG.debounceMs,
+  debounceMs = SEARCH.DEBOUNCE_DELAY,
 }: UseSearchOptions): UseQueryResult<SearchResult[], Error> {
   // Normalize query: trim whitespace and lowercase
   const normalizedQuery = query.trim().toLowerCase();
@@ -173,7 +173,7 @@ export function useDebouncedSearch(
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
-    }, options.debounceMs || SEARCH_CONFIG.debounceMs);
+    }, options.debounceMs || SEARCH.DEBOUNCE_DELAY);
 
     return () => clearTimeout(timer);
   }, [query, options.debounceMs]);

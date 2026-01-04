@@ -7,9 +7,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Input, Textarea, Button, Badge } from '@/components/ui';
+import { Input, Textarea, Button, Badge, CodePreview } from '@/components/ui';
 import { useCreateSolution, useUpdateSolution } from '@/hooks';
-import { LANGUAGES, VALIDATION_LIMITS } from '@/lib/constants';
+import { LANGUAGES, VALIDATION } from '@/lib/constants';
+import { triggerRealisticConfetti } from '@/lib/confetti';
 import type { Solution, SolutionCreate, SolutionUpdate } from '@/lib/types';
 
 // ============================================================================
@@ -87,28 +88,28 @@ export function SolutionForm({
     // Title validation
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
-    } else if (formData.title.length < VALIDATION_LIMITS.title.min) {
-      newErrors.title = `Title must be at least ${VALIDATION_LIMITS.title.min} characters`;
-    } else if (formData.title.length > VALIDATION_LIMITS.title.max) {
-      newErrors.title = `Title must not exceed ${VALIDATION_LIMITS.title.max} characters`;
+    } else if (formData.title.length < VALIDATION.TITLE.MIN) {
+      newErrors.title = `Title must be at least ${VALIDATION.TITLE.MIN} characters`;
+    } else if (formData.title.length > VALIDATION.TITLE.MAX) {
+      newErrors.title = `Title must not exceed ${VALIDATION.TITLE.MAX} characters`;
     }
 
     // Description validation
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required';
-    } else if (formData.description.length < VALIDATION_LIMITS.description.min) {
-      newErrors.description = `Description must be at least ${VALIDATION_LIMITS.description.min} characters`;
-    } else if (formData.description.length > VALIDATION_LIMITS.description.max) {
-      newErrors.description = `Description must not exceed ${VALIDATION_LIMITS.description.max} characters`;
+    } else if (formData.description.length < VALIDATION.DESCRIPTION.MIN) {
+      newErrors.description = `Description must be at least ${VALIDATION.DESCRIPTION.MIN} characters`;
+    } else if (formData.description.length > VALIDATION.DESCRIPTION.MAX) {
+      newErrors.description = `Description must not exceed ${VALIDATION.DESCRIPTION.MAX} characters`;
     }
 
     // Code validation
     if (!formData.code.trim()) {
       newErrors.code = 'Code is required';
-    } else if (formData.code.length < VALIDATION_LIMITS.code.min) {
-      newErrors.code = `Code must be at least ${VALIDATION_LIMITS.code.min} characters`;
-    } else if (formData.code.length > VALIDATION_LIMITS.code.max) {
-      newErrors.code = `Code must not exceed ${VALIDATION_LIMITS.code.max} characters`;
+    } else if (formData.code.length < VALIDATION.CODE.MIN) {
+      newErrors.code = `Code must be at least ${VALIDATION.CODE.MIN} characters`;
+    } else if (formData.code.length > VALIDATION.CODE.MAX) {
+      newErrors.code = `Code must not exceed ${VALIDATION.CODE.MAX} characters`;
     }
 
     // Language validation
@@ -122,10 +123,10 @@ export function SolutionForm({
       .map(t => t.trim())
       .filter(t => t.length > 0);
 
-    if (tagsArray.length < VALIDATION_LIMITS.tags.min) {
-      newErrors.tags = `At least ${VALIDATION_LIMITS.tags.min} tag is required`;
-    } else if (tagsArray.length > VALIDATION_LIMITS.tags.max) {
-      newErrors.tags = `Maximum ${VALIDATION_LIMITS.tags.max} tags allowed`;
+    if (tagsArray.length < 1) {
+      newErrors.tags = `At least 1 tag is required`;
+    } else if (tagsArray.length > VALIDATION.TAGS.MAX_COUNT) {
+      newErrors.tags = `Maximum ${VALIDATION.TAGS.MAX_COUNT} tags allowed`;
     }
 
     setErrors(newErrors);
@@ -160,6 +161,8 @@ export function SolutionForm({
 
       if (mode === 'create') {
         result = await createSolution.mutateAsync(data as SolutionCreate);
+        // Celebrate successful creation!
+        triggerRealisticConfetti();
       } else {
         result = await updateSolution.mutateAsync({
           id: solution!.id,
@@ -199,7 +202,7 @@ export function SolutionForm({
         onChange={(e) => handleChange('title', e.target.value)}
         hasError={!!errors.title}
         errorMessage={errors.title}
-        helperText={`${formData.title.length}/${VALIDATION_LIMITS.title.max} characters`}
+        helperText={`${formData.title.length}/${VALIDATION.TITLE.MAX} characters`}
         required
         placeholder="e.g., Binary Search Algorithm in Python"
       />
@@ -212,40 +215,56 @@ export function SolutionForm({
         hasError={!!errors.description}
         errorMessage={errors.description}
         showCount
-        maxLength={VALIDATION_LIMITS.description.max}
+        maxLength={VALIDATION.DESCRIPTION.MAX}
         required
         placeholder="Describe what this solution does and when to use it..."
         rows={4}
       />
 
       {/* Code */}
-      <Textarea
-        label="Code"
-        value={formData.code}
-        onChange={(e) => handleChange('code', e.target.value)}
-        hasError={!!errors.code}
-        errorMessage={errors.code}
-        showCount
-        maxLength={VALIDATION_LIMITS.code.max}
-        autoResize
-        required
-        placeholder="Paste your code here..."
-        rows={12}
-        className="font-mono text-sm"
-      />
+      <div>
+        <Textarea
+          label="Code"
+          value={formData.code}
+          onChange={(e) => handleChange('code', e.target.value)}
+          hasError={!!errors.code}
+          errorMessage={errors.code}
+          showCount
+          maxLength={VALIDATION.CODE.MAX}
+          autoResize
+          required
+          placeholder="Paste your code here..."
+          rows={12}
+          className="font-mono text-sm"
+        />
+        
+        {/* Live Code Preview */}
+        {formData.code.trim() && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Live Preview
+            </label>
+            <CodePreview 
+              code={formData.code} 
+              language={formData.language}
+              className="animate-fade-in"
+            />
+          </div>
+        )}
+      </div>
 
       {/* Language Dropdown */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-slate-300 mb-2">
           Programming Language <span className="text-red-500">*</span>
         </label>
         <select
           value={formData.language}
           onChange={(e) => handleChange('language', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 text-slate-100 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 hover:bg-slate-600/50 transition-colors"
         >
           {LANGUAGES.map((lang) => (
-            <option key={lang} value={lang.toLowerCase()}>
+            <option key={lang} value={lang.toLowerCase()} className="bg-slate-800 text-slate-100">
               {lang}
             </option>
           ))}

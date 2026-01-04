@@ -147,7 +147,10 @@ export function SearchBar({
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="pr-20"
+          className="pr-20 py-3 text-base bg-slate-700/50 border border-slate-600 text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 hover:bg-slate-600/50 transition-colors"
+          style={{
+            backgroundClip: 'padding-box',
+          }}
         />
         
         {/* Loading Spinner or Clear Button */}

@@ -6,7 +6,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, Badge } from '@/components/ui';
+import { Card, Badge, ColorTag, CopyButton, LanguageIcon } from '@/components/ui';
 import { formatDate, truncateText, getSimilarityColor, getSimilarityLevel } from '@/lib/utils';
 import type { SearchResult } from '@/lib/types';
 
@@ -63,7 +63,7 @@ export function ResultCard({
             </p>
           </div>
           
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+          <div className="flex flex-col items-end gap-2 shrink-0">
             <Badge variant={similarityColor} size="lg">
               {similarityPercent}% Match
             </Badge>
@@ -74,32 +74,31 @@ export function ResultCard({
         </div>
 
         {/* Code Preview */}
-        <div className="bg-gray-50 rounded-md p-3 mb-3 overflow-hidden">
-          <pre className="text-sm text-gray-800 font-mono overflow-x-auto">
+        <div className="bg-slate-900 rounded-md p-3 mb-3 overflow-hidden relative group">
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <CopyButton text={result.code} />
+          </div>
+          <pre className="text-sm text-slate-200 font-mono overflow-x-auto">
             <code>
               {showFullCode ? result.code : truncateText(result.code, 200)}
             </code>
           </pre>
           {!showFullCode && result.code.length > 200 && (
-            <p className="text-xs text-gray-500 mt-2">Click to view full code...</p>
+            <p className="text-xs text-slate-400 mt-2">Click to view full code...</p>
           )}
         </div>
 
         {/* Footer: Language, Tags, Date */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="info" size="sm">
-              {result.language}
-            </Badge>
+            <LanguageIcon language={result.language} size="sm" />
             
             {result.tags.slice(0, 4).map((tag) => (
-              <Badge key={tag} variant="outline" size="sm">
-                {tag}
-              </Badge>
+              <ColorTag key={tag} tag={tag} size="sm" />
             ))}
             
             {result.tags.length > 4 && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-slate-400">
                 +{result.tags.length - 4} more
               </span>
             )}

@@ -54,19 +54,21 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    // Generate unique ID if not provided
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+    // Use provided ID only (don't generate random IDs for SSR compatibility)
+    const inputId = id;
 
     // Base input styles
     const inputStyles = cn(
-      'px-4 py-2 rounded-lg border transition-colors duration-200',
-      'text-base text-gray-900 placeholder:text-gray-400',
-      'focus:outline-none focus:ring-2 focus:ring-offset-1',
-      'disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50',
+      'px-4 py-2 rounded-lg border transition-all duration-200',
+      'text-base text-slate-50 placeholder:text-slate-400',
+      'bg-slate-800 border-slate-600',
+      'focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500',
+      'hover:bg-slate-700/50',
+      'disabled:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50',
       // Error state
       hasError
-        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-        : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500',
+        ? 'border-red-500 focus:ring-red-400 focus:border-red-400'
+        : '',
       // Width
       fullWidth ? 'w-full' : '',
       className
@@ -78,10 +80,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-gray-700"
+            className="text-sm font-medium text-slate-200"
           >
             {label}
-            {props.required && <span className="text-red-500 ml-1">*</span>}
+            {props.required && <span className="text-red-400 ml-1">*</span>}
           </label>
         )}
 
@@ -93,7 +95,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <p
             className={cn(
               'text-sm',
-              hasError || errorMessage ? 'text-red-600' : 'text-gray-500'
+              hasError || errorMessage ? 'text-red-400' : 'text-slate-400'
             )}
           >
             {errorMessage || helperText}

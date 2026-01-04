@@ -54,14 +54,14 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     // Base card styles
     const baseStyles = cn(
       'rounded-lg transition-all duration-200',
-      'bg-white'
+      'bg-slate-800 border-2 border-slate-700'
     );
 
     // Variant styles
     const variantStyles = {
-      default: 'border border-gray-200 shadow-sm',
-      elevated: 'border-0 shadow-md hover:shadow-lg',
-      outlined: 'border-2 border-gray-300 shadow-none',
+      default: 'shadow-lg shadow-black/30',
+      elevated: 'shadow-xl shadow-black/40 hover:shadow-2xl hover:shadow-blue-500/50 border-l-4 border-l-blue-500/50',
+      outlined: 'border-2 border-slate-600 shadow-md hover:border-blue-500/70 hover:shadow-lg hover:shadow-blue-500/30',
     };
 
     // Padding styles
@@ -76,8 +76,9 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     const clickableStyles = clickable
       ? cn(
           'cursor-pointer',
-          'hover:shadow-lg hover:scale-[1.02]',
-          'active:scale-[0.98]'
+          'hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02] hover:border-blue-500/70',
+          'active:scale-[0.98]',
+          'border-l-4 border-l-transparent hover:border-l-blue-500'
         )
       : '';
 

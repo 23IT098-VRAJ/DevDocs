@@ -82,13 +82,9 @@ export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
         ref={ref}
         {...props}
       >
-        {/* Spinning circle */}
+        {/* 3-Dot Gradient Animation */}
         <div
-          className={cn(
-            'animate-spin rounded-full',
-            sizeStyles[size],
-            variantStyles[variant]
-          )}
+          className="dot-flashing"
           role="status"
           aria-label={label || 'Loading'}
         />
@@ -97,7 +93,7 @@ export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
         {label && (
           <p
             className={cn(
-              'font-medium text-gray-700',
+              'font-medium text-slate-400',
               labelSizeStyles[size]
             )}
           >
