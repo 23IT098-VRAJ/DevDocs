@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useSolution, useDeleteSolution } from '@/hooks/useSolutions';
 import { Button, Card, Badge, Spinner } from '@/components/ui';
 import { formatDate } from '@/lib/utils';
+import { BackgroundEffects } from '@/components/layout/BackgroundEffects';
 
 interface SolutionDetailPageProps {
   params: { id: string };
@@ -35,15 +36,20 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
-        <Spinner size="lg" />
+      <div className="relative">
+        <BackgroundEffects opacity="low" />
+        <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh] relative z-10">
+          <Spinner size="lg" />
+        </div>
       </div>
     );
   }
 
   if (error || !solution) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="relative">
+        <BackgroundEffects opacity="low" />
+        <div className="container mx-auto px-4 py-8 relative z-10">
         <Card className="p-12 text-center">
           <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -54,12 +60,15 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
             <Button variant="primary">Back to Dashboard</Button>
           </Link>
         </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="relative">
+      <BackgroundEffects opacity="low" />
+      <div className="container mx-auto px-4 py-8 max-w-5xl relative z-10">
       {/* Header */}
       <div className="mb-6">
         <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 flex items-center gap-1 mb-4">
@@ -115,16 +124,16 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
 
       {/* Code */}
       <Card className="p-0 mb-6 overflow-hidden">
-        <div className="bg-gray-800 px-6 py-3 flex justify-between items-center">
+        <div className="bg-black px-6 py-3 flex justify-between items-center">
           <h2 className="text-sm font-semibold text-white">Code</h2>
           <button
             onClick={() => navigator.clipboard.writeText(solution.code)}
-            className="px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            className="px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-slate-900 rounded transition-colors"
           >
             Copy
           </button>
         </div>
-        <pre className="p-6 overflow-x-auto bg-gray-900">
+        <pre className="p-6 overflow-x-auto bg-black">
           <code className="text-sm text-gray-100 font-mono">{solution.code}</code>
         </pre>
       </Card>
@@ -142,6 +151,7 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
           </div>
         </Card>
       )}
+      </div>
     </div>
   );
 }

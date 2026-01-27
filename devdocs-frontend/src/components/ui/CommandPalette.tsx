@@ -96,7 +96,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
       {/* Modal */}
       <div className="fixed top-20 left-1/2 -translate-x-1/2 w-full max-w-2xl z-50 px-4">
-        <div className="bg-slate-800 rounded-xl shadow-2xl shadow-black/50 border border-slate-700 overflow-hidden animate-scale-in">
+        <div className="bg-black rounded-xl shadow-2xl shadow-black/50 border border-slate-700 overflow-hidden animate-scale-in">
           {/* Search Input */}
           <div className="p-4 border-b border-slate-700">
             <div className="relative">
@@ -109,9 +109,9 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search code solutions..."
-                className="w-full pl-10 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 hover:bg-slate-600/50 transition-colors"
+                className="w-full pl-10 pr-4 py-3 bg-black border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 hover:bg-slate-900 transition-colors"
               />
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-semibold text-slate-400 bg-slate-700 border border-slate-600 rounded">
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-semibold text-slate-400 bg-slate-900 border border-slate-600 rounded">
                 ESC
               </kbd>
             </div>
@@ -127,7 +127,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                 {recentSearches.map((search, index) => (
                   <div
                     key={index}
-                    className="group flex items-center justify-between p-2 rounded-lg hover:bg-slate-700/50 cursor-pointer transition-colors"
+                    className="group flex items-center justify-between p-2 rounded-lg hover:bg-slate-900 cursor-pointer transition-colors"
                     onClick={() => handleSearch(search)}
                   >
                     <div className="flex items-center gap-3">
@@ -141,7 +141,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                         e.stopPropagation();
                         deleteRecentSearch(search);
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-600 rounded transition-all"
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-800 rounded transition-all"
                     >
                       <svg className="w-4 h-4 text-slate-400 hover:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -154,15 +154,15 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           )}
 
           {/* Quick Actions */}
-          <div className="p-4 border-t border-slate-700 bg-slate-900/50">
+          <div className="p-4 border-t border-slate-700 bg-black">
             <div className="flex items-center justify-between text-xs text-slate-500">
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 bg-slate-700 border border-slate-600 rounded">↵</kbd>
+                  <kbd className="px-1.5 py-0.5 bg-slate-900 border border-slate-600 rounded">↵</kbd>
                   to search
                 </span>
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 bg-slate-700 border border-slate-600 rounded">ESC</kbd>
+                  <kbd className="px-1.5 py-0.5 bg-slate-900 border border-slate-600 rounded">ESC</kbd>
                   to close
                 </span>
               </div>

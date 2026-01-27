@@ -1,32 +1,73 @@
 @import "tailwindcss";
 
 :root {
-  /* Modern Dark Theme Colors */
-  --background-deep: #0f172a;
-  --background-surface: #1e293b;
-  --background-elevated: #334155;
+  /* Flutter Theme - Dark Mode Colors */
+  /* Primary Cyan Colors */
+  --color-primary: #25d1f4;
+  --color-primary-light: #3ae0ff;
+  --color-primary-dark: #1fc2e5;
+  
+  /* Background Colors - Pure Black */
+  --background-deep: #000000;
+  --background-surface: #000000;
+  --background-elevated: #0a0a0a;
+  --background-card: #0a0a0a;
+  --background-input: #000000;
+  --background-darker: #000000;
+  --background-mid: #050505;
+  --background-dark-blue: #000000;
+  --background-darker-surface: #0a0a0a;
+  --background-very-dark: #000000;
+  --background-deep-dark: #000000;
+  --background-code: #0a0a0a;
   
   /* Accent Colors */
-  --color-primary: #3b82f6;
-  --color-primary-dark: #2563eb;
-  --color-violet: #8b5cf6;
-  --color-cyan: #06b6d4;
-  --color-emerald: #10b981;
-  --color-amber: #f59e0b;
-  --color-red: #ef4444;
+  --color-orange: #f97316;
+  --color-purple: #a855f7;
+  --color-pink: #ec4899;
+  --color-green: #10b981;
   
   /* Text Colors */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #ffffff;
+  --text-secondary: #9cb5ba;
+  --text-tertiary: #64748b;
+  --text-muted: #475569;
+  --text-grey: #9ca3af;
+  --text-light-grey: #d1d5db;
+  --text-mid-grey: #6b7280;
+  --text-dark-grey: #4a5f64;
+  --text-slate: #94a3b8;
+  
+  /* Semantic Colors */
+  --color-success: #6cc24a;
+  --color-success-alt: #22c55e;
+  --color-warning: #fbbf24;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
   
   /* Border Colors */
-  --border-default: #334155;
-  --border-light: #475569;
+  --border-light: #334155;
+  --border-dark: #1e3338;
+  --border-profile: #334155;
+  --border-input: #3b5054;
   
-  /* Base colors for theme switching */
-  --background: #0f172a;
-  --foreground: #f1f5f9;
+  /* Badge Colors */
+  --badge-gold: #fbbf24;
+  --badge-silver: #94a3b8;
+  --badge-bronze: #ea580c;
+  --badge-purple: #a855f7;
+  --badge-green: #10b981;
+  
+  /* Code Highlighting */
+  --code-keyword: #c792ea;
+  --code-function: #82aaff;
+  --code-variable: #25d1f4;
+  --code-string: #c3e88d;
+  --code-comment: #546e7a;
+  
+  /* Legacy support */
+  --background: #000000;
+  --foreground: #ffffff;
 }
 
 @theme inline {
@@ -74,8 +115,8 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  color: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(90deg, #25d1f4, #1fc2e5);
+  color: linear-gradient(90deg, #25d1f4, #1fc2e5);
   animation: bounce-dot 1.4s infinite ease-in-out both;
 }
 
@@ -88,7 +129,7 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(90deg, #25d1f4, #1fc2e5);
 }
 
 .dot-flashing::before {
@@ -171,7 +212,7 @@ body {
   position: absolute;
   width: 4px;
   height: 4px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.8), transparent);
+  background: radial-gradient(circle, rgba(37, 209, 244, 0.8), transparent);
   border-radius: 50%;
   animation: particle-float 6s ease-in-out infinite;
 }
@@ -186,7 +227,7 @@ body {
   position: absolute;
   font-family: 'Courier New', monospace;
   font-size: 12px;
-  color: rgba(59, 130, 246, 0.15);
+  color: rgba(37, 209, 244, 0.25);
   font-weight: bold;
   pointer-events: none;
   animation: float 15s ease-in-out infinite;
@@ -272,4 +313,89 @@ body {
 /* Smooth Transitions */
 * {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Prism.js Theme - Flutter Cyan */
+/* Override prism-tomorrow.css with Flutter theme colors */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: var(--text-primary) !important;
+  background: var(--background-code) !important;
+  text-shadow: none !important;
+}
+
+/* Tokens */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--code-comment) !important;
+}
+
+.token.punctuation {
+  color: var(--text-secondary) !important;
+}
+
+.token.namespace {
+  opacity: 0.7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: var(--color-orange) !important;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: var(--code-string) !important;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: var(--color-pink) !important;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: var(--code-keyword) !important;
+}
+
+.token.function,
+.token.class-name {
+  color: var(--code-function) !important;
+}
+
+.token.variable {
+  color: var(--code-variable) !important;
+}
+
+.token.regex,
+.token.important {
+  color: var(--color-green) !important;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
 }

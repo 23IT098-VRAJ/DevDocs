@@ -9,16 +9,19 @@ import Link from 'next/link';
 import { Button, Card, Spinner, EmptyState } from '@/components/ui';
 import { useDashboard } from '@/hooks/useDashboard';
 import { SolutionCard } from '@/components/solution/SolutionCard';
+import { BackgroundEffects } from '@/components/layout/BackgroundEffects';
 
 export default function DashboardPage() {
   const { stats, recentSolutions, isStatsLoading, isRecentLoading, statsError, recentError } = useDashboard();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="relative">
+      <BackgroundEffects opacity="low" />
+      <div className="container mx-auto px-4 py-8 relative z-10">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent mb-2">Dashboard</h1>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent mb-2">Dashboard</h1>
           <p className="text-slate-400">Overview of your code solutions and activity</p>
         </div>
         <Link href="/solution/create">
@@ -34,7 +37,7 @@ export default function DashboardPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {/* Total Solutions */}
-        <Card className="p-6 group hover:shadow-xl hover:shadow-blue-500/20 hover:border-blue-500/50 transition-all">
+        <Card className="p-6 group hover:shadow-xl hover:shadow-cyan-400/20 hover:border-cyan-400/50 transition-all">
           {isStatsLoading ? (
             <div className="flex justify-center py-4">
               <Spinner size="sm" />
@@ -45,8 +48,8 @@ export default function DashboardPage() {
             <>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-slate-400">Total Solutions</h3>
-                <div className="p-2 bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30 rounded-lg group-hover:shadow-lg group-hover:shadow-blue-500/50 transition-all">
-                  <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-2 bg-gradient-to-br from-cyan-400/20 to-cyan-600/20 border border-cyan-400/30 rounded-lg group-hover:shadow-lg group-hover:shadow-cyan-400/50 transition-all">
+                  <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
@@ -58,7 +61,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Languages */}
-        <Card className="p-6 group hover:shadow-xl hover:shadow-violet-500/20 hover:border-violet-500/50 transition-all">
+        <Card className="p-6 group hover:shadow-xl hover:shadow-purple-500/20 hover:border-purple-500/50 transition-all">
           {isStatsLoading ? (
             <div className="flex justify-center py-4">
               <Spinner size="sm" />
@@ -69,8 +72,8 @@ export default function DashboardPage() {
             <>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-slate-400">Languages</h3>
-                <div className="p-2 bg-gradient-to-br from-violet-500/20 to-violet-600/20 border border-violet-500/30 rounded-lg group-hover:shadow-lg group-hover:shadow-violet-500/50 transition-all">
-                  <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-2 bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-lg group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all">
+                  <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                   </svg>
                 </div>
@@ -134,12 +137,12 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-4">Quick Actions</h2>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link href="/solution/create">
-            <Card className="p-6 group cursor-pointer bg-gradient-to-br from-blue-500/10 to-violet-500/10 border-2 border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/50 hover:border-blue-500/60 hover:scale-[1.03] hover:from-blue-500/20 hover:to-violet-500/20 transition-all duration-300">
+            <Card className="p-6 group cursor-pointer bg-gradient-to-br from-cyan-400/10 to-cyan-600/10 border-2 border-cyan-400/30 hover:shadow-2xl hover:shadow-cyan-400/50 hover:border-cyan-400/60 hover:scale-[1.03] hover:from-cyan-400/20 hover:to-cyan-600/20 transition-all duration-300">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-gradient-to-br from-blue-500 to-violet-500 rounded-lg shadow-lg shadow-blue-500/50 group-hover:shadow-xl group-hover:shadow-blue-500/70 group-hover:scale-110 transition-all">
+                <div className="p-3 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-lg shadow-lg shadow-cyan-400/50 group-hover:shadow-xl group-hover:shadow-cyan-400/70 group-hover:scale-110 transition-all">
                   <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
@@ -153,9 +156,9 @@ export default function DashboardPage() {
           </Link>
 
           <Link href="/search">
-            <Card className="p-6 group cursor-pointer bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border-2 border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-500/50 hover:border-emerald-500/60 hover:scale-[1.03] hover:from-emerald-500/20 hover:to-cyan-500/20 transition-all duration-300">
+            <Card className="p-6 group cursor-pointer bg-gradient-to-br from-green-500/10 to-cyan-400/10 border-2 border-green-500/30 hover:shadow-2xl hover:shadow-green-500/50 hover:border-green-500/60 hover:scale-[1.03] hover:from-green-500/20 hover:to-cyan-400/20 transition-all duration-300">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-lg shadow-lg shadow-emerald-500/50 group-hover:shadow-xl group-hover:shadow-emerald-500/70 group-hover:scale-110 transition-all">
+                <div className="p-3 bg-gradient-to-br from-green-500 to-cyan-400 rounded-lg shadow-lg shadow-green-500/50 group-hover:shadow-xl group-hover:shadow-green-500/70 group-hover:scale-110 transition-all">
                   <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -169,9 +172,9 @@ export default function DashboardPage() {
           </Link>
 
           <Link href="/solution">
-            <Card className="p-6 group cursor-pointer bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 border-2 border-violet-500/30 hover:shadow-2xl hover:shadow-violet-500/50 hover:border-violet-500/60 hover:scale-[1.03] hover:from-violet-500/20 hover:to-fuchsia-500/20 transition-all duration-300">
+            <Card className="p-6 group cursor-pointer bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/50 hover:border-purple-500/60 hover:scale-[1.03] hover:from-purple-500/20 hover:to-pink-500/20 transition-all duration-300">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-lg shadow-lg shadow-violet-500/50 group-hover:shadow-xl group-hover:shadow-violet-500/70 group-hover:scale-110 transition-all">
+                <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-lg shadow-purple-500/50 group-hover:shadow-xl group-hover:shadow-purple-500/70 group-hover:scale-110 transition-all">
                   <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                   </svg>
@@ -189,7 +192,7 @@ export default function DashboardPage() {
       {/* Recent Solutions */}
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Recent Activity</h2>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent">Recent Activity</h2>
           <Link href="/solution">
             <Button variant="ghost" size="sm">
               View All →
@@ -225,6 +228,7 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

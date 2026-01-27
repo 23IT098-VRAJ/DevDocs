@@ -17,13 +17,13 @@ export const LANGUAGE_ICONS: Record<string, LanguageConfig> = {
   },
   typescript: {
     icon: '📘',
-    color: 'text-blue-400',
-    gradient: 'from-blue-500 to-blue-600',
+    color: 'text-cyan-400',
+    gradient: 'from-cyan-400 to-cyan-600',
   },
   python: {
     icon: '🐍',
-    color: 'text-blue-300',
-    gradient: 'from-blue-400 to-yellow-400',
+    color: 'text-cyan-300',
+    gradient: 'from-cyan-400 to-cyan-500',
   },
   java: {
     icon: '☕',
@@ -33,7 +33,7 @@ export const LANGUAGE_ICONS: Record<string, LanguageConfig> = {
   go: {
     icon: '🔷',
     color: 'text-cyan-400',
-    gradient: 'from-cyan-400 to-blue-400',
+    gradient: 'from-cyan-300 to-cyan-500',
   },
   rust: {
     icon: '🦀',
@@ -42,8 +42,8 @@ export const LANGUAGE_ICONS: Record<string, LanguageConfig> = {
   },
   cpp: {
     icon: '⚙️',
-    color: 'text-blue-500',
-    gradient: 'from-blue-600 to-indigo-600',
+    color: 'text-purple-400',
+    gradient: 'from-purple-500 to-purple-600',
   },
   csharp: {
     icon: '#️⃣',

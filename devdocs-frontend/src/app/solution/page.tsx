@@ -9,16 +9,19 @@ import Link from 'next/link';
 import { useSolutions } from '@/hooks/useSolutions';
 import { SolutionCard } from '@/components/solution/SolutionCard';
 import { Button, Card, Spinner } from '@/components/ui';
+import { BackgroundEffects } from '@/components/layout/BackgroundEffects';
 
 export default function SolutionsPage() {
   const { data: solutions, isLoading, error } = useSolutions();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="relative">
+      <BackgroundEffects opacity="low" />
+      <div className="container mx-auto px-4 py-8 relative z-10">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent mb-2">All Solutions</h1>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent mb-2">All Solutions</h1>
           <p className="text-slate-400">
             Browse your entire knowledge base of code solutions
           </p>
@@ -35,9 +38,9 @@ export default function SolutionsPage() {
 
       {/* Stats Bar */}
       {solutions && solutions.length > 0 && (
-        <div className="mb-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/30 shadow-lg shadow-blue-500/10">
-          <p className="text-sm text-blue-400">
-            <span className="font-semibold text-blue-300">{solutions.length}</span> solution{solutions.length !== 1 ? 's' : ''} in your knowledge base
+        <div className="mb-6 p-4 bg-cyan-400/10 rounded-lg border border-cyan-400/30 shadow-lg shadow-cyan-400/10">
+          <p className="text-sm text-cyan-400">
+            <span className="font-semibold text-cyan-300">{solutions.length}</span> solution{solutions.length !== 1 ? 's' : ''} in your knowledge base
           </p>
         </div>
       )}
@@ -92,6 +95,7 @@ export default function SolutionsPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

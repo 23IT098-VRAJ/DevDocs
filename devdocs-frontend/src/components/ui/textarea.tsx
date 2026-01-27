@@ -74,10 +74,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const textareaStyles = cn(
       'px-4 py-3 rounded-lg border transition-all duration-200',
       'text-base text-slate-50 placeholder:text-slate-400',
-      'bg-slate-800 border-slate-600',
+      'bg-black border-slate-600',
       'focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500',
-      'hover:bg-slate-700/50',
-      'disabled:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50',
+      'hover:bg-slate-900',
+      'disabled:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-50',
       'resize-y', // Allow vertical resizing only
       // Error state
       hasError

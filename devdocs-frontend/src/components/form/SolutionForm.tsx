@@ -231,7 +231,6 @@ export function SolutionForm({
           errorMessage={errors.code}
           showCount
           maxLength={VALIDATION.CODE.MAX}
-          autoResize
           required
           placeholder="Paste your code here..."
           rows={12}

@@ -23,16 +23,16 @@ export const TAG_COLORS: Record<string, TagColor> = {
     border: 'border-yellow-500/50',
   },
   typescript: {
-    gradient: 'from-blue-500/20 to-blue-600/20',
-    hover: 'hover:from-blue-500/30 hover:to-blue-600/30',
-    text: 'text-blue-400',
-    border: 'border-blue-500/50',
+    gradient: 'from-cyan-400/20 to-cyan-600/20',
+    hover: 'hover:from-cyan-400/30 hover:to-cyan-600/30',
+    text: 'text-cyan-400',
+    border: 'border-cyan-400/50',
   },
   python: {
-    gradient: 'from-blue-400/20 to-yellow-400/20',
-    hover: 'hover:from-blue-400/30 hover:to-yellow-400/30',
-    text: 'text-blue-300',
-    border: 'border-blue-400/50',
+    gradient: 'from-cyan-400/20 to-cyan-500/20',
+    hover: 'hover:from-cyan-400/30 hover:to-cyan-500/30',
+    text: 'text-cyan-300',
+    border: 'border-cyan-400/50',
   },
   java: {
     gradient: 'from-red-500/20 to-orange-500/20',
@@ -41,10 +41,10 @@ export const TAG_COLORS: Record<string, TagColor> = {
     border: 'border-red-500/50',
   },
   go: {
-    gradient: 'from-cyan-400/20 to-blue-400/20',
-    hover: 'hover:from-cyan-400/30 hover:to-blue-400/30',
+    gradient: 'from-cyan-300/20 to-cyan-500/20',
+    hover: 'hover:from-cyan-300/30 hover:to-cyan-500/30',
     text: 'text-cyan-400',
-    border: 'border-cyan-500/50',
+    border: 'border-cyan-400/50',
   },
   rust: {
     gradient: 'from-orange-500/20 to-orange-600/20',
@@ -55,16 +55,16 @@ export const TAG_COLORS: Record<string, TagColor> = {
 
   // Category tags
   algorithm: {
-    gradient: 'from-violet-500/20 to-purple-600/20',
-    hover: 'hover:from-violet-500/30 hover:to-purple-600/30',
-    text: 'text-violet-400',
-    border: 'border-violet-500/50',
+    gradient: 'from-purple-500/20 to-purple-600/20',
+    hover: 'hover:from-purple-500/30 hover:to-purple-600/30',
+    text: 'text-purple-400',
+    border: 'border-purple-500/50',
   },
   'data-structure': {
-    gradient: 'from-emerald-500/20 to-green-600/20',
-    hover: 'hover:from-emerald-500/30 hover:to-green-600/30',
-    text: 'text-emerald-400',
-    border: 'border-emerald-500/50',
+    gradient: 'from-green-500/20 to-green-600/20',
+    hover: 'hover:from-green-500/30 hover:to-green-600/30',
+    text: 'text-green-400',
+    border: 'border-green-500/50',
   },
   sorting: {
     gradient: 'from-pink-500/20 to-rose-600/20',

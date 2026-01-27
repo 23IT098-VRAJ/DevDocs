@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
-import { Header, Footer } from "@/components/layout";
+import { ConditionalLayout } from "@/components/layout/ConditionalLayout";
 import { PageTransition } from "@/components/layout/PageTransition";
 
 const geistSans = Geist({
@@ -33,13 +33,9 @@ export default function RootLayout({
       >
         <QueryProvider>
           <ThemeProvider>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">
-                <PageTransition>{children}</PageTransition>
-              </main>
-              <Footer />
-            </div>
+            <ConditionalLayout>
+              <PageTransition>{children}</PageTransition>
+            </ConditionalLayout>
           </ThemeProvider>
         </QueryProvider>
       </body>

@@ -29,7 +29,7 @@ export function CopyButton({ text, className = '' }: CopyButtonProps) {
   return (
     <button
       onClick={handleCopy}
-      className={`group relative px-3 py-1.5 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 hover:border-slate-500 transition-all duration-200 ${className}`}
+      className={`group relative px-3 py-1.5 rounded-lg bg-black hover:bg-slate-900 border border-slate-600/50 hover:border-slate-500 transition-all duration-200 ${className}`}
       title="Copy to clipboard"
     >
       <div className="flex items-center gap-2">

@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useSolution } from '@/hooks/useSolutions';
 import { SolutionForm } from '@/components/form/SolutionForm';
 import { Card, Spinner } from '@/components/ui';
+import { BackgroundEffects } from '@/components/layout/BackgroundEffects';
 
 interface EditSolutionPageProps {
   params: { id: string };
@@ -25,15 +26,20 @@ export default function EditSolutionPage({ params }: EditSolutionPageProps) {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
-        <Spinner size="lg" />
+      <div className="relative">
+        <BackgroundEffects opacity="low" />
+        <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh] relative z-10">
+          <Spinner size="lg" />
+        </div>
       </div>
     );
   }
 
   if (error || !solution) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="relative">
+        <BackgroundEffects opacity="low" />
+        <div className="container mx-auto px-4 py-8 relative z-10">
         <Card className="p-12 text-center">
           <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -44,12 +50,15 @@ export default function EditSolutionPage({ params }: EditSolutionPageProps) {
             <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Back to Dashboard</button>
           </Link>
         </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="relative">
+      <BackgroundEffects opacity="low" />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
       {/* Header */}
       <div className="mb-8">
         <Link href={`/solution/${params.id}`} className="text-blue-600 hover:text-blue-700 flex items-center gap-1 mb-4">
@@ -66,6 +75,7 @@ export default function EditSolutionPage({ params }: EditSolutionPageProps) {
       <Card className="p-8">
         <SolutionForm mode="edit" solution={solution} onSuccess={handleSuccess} />
       </Card>
+      </div>
     </div>
   );
 }

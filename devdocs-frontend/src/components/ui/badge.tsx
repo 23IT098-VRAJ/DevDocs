@@ -56,7 +56,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
 
     // Variant styles (matching SIMILARITY_COLORS from constants)
     const variantStyles = {
-      default: 'bg-gradient-to-r from-blue-500 to-violet-500 text-white shadow-lg shadow-blue-500/30',
+      default: 'bg-gradient-to-r from-cyan-400 to-cyan-600 text-white shadow-lg shadow-cyan-400/30',
       success: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
       warning: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
       error: 'bg-red-500/20 text-red-400 border border-red-500/30',

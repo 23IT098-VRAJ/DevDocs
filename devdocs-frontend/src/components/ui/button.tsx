@@ -65,10 +65,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // Variant-specific styles
     const variantStyles = {
       primary: cn(
-        'bg-gradient-to-r from-blue-500 to-violet-500 text-white shadow-lg shadow-blue-500/30',
-        'hover:from-blue-600 hover:to-violet-600 hover:shadow-2xl hover:shadow-blue-500/60 hover:-translate-y-0.5',
-        'focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900',
-        'disabled:hover:from-blue-500 disabled:hover:to-violet-500 disabled:shadow-lg disabled:hover:translate-y-0 disabled:hover:scale-100'
+        'bg-gradient-to-r from-cyan-400 to-cyan-600 text-white shadow-lg shadow-cyan-400/30',
+        'hover:from-cyan-500 hover:to-cyan-700 hover:shadow-2xl hover:shadow-cyan-400/60 hover:-translate-y-0.5',
+        'focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900',
+        'disabled:hover:from-cyan-400 disabled:hover:to-cyan-600 disabled:shadow-lg disabled:hover:translate-y-0 disabled:hover:scale-100'
       ),
       secondary: cn(
         'bg-slate-700 text-slate-100 border border-slate-600',

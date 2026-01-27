@@ -7,6 +7,7 @@
 
 import Link from 'next/link';
 import { APP_NAME, APP_VERSION } from '@/lib/constants';
+import { BackgroundEffects } from '@/components/layout/BackgroundEffects';
 
 // ============================================================================
 // TYPES
@@ -63,18 +64,19 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t-2 border-transparent bg-gradient-to-r from-blue-500/20 via-violet-500/20 to-cyan-500/20">
-      <div className="bg-slate-800/90 backdrop-blur-sm">
-      <div className="container mx-auto px-4 py-12">
+    <footer className="w-full border-t-2 border-transparent bg-gradient-to-r from-cyan-400/20 via-cyan-500/20 to-cyan-600/20">
+      <div className="relative bg-black/95 backdrop-blur-sm">
+      <BackgroundEffects opacity="low" showFloatingCode={false} />
+      <div className="container mx-auto px-4 py-12 relative z-10">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-blue-500 to-violet-500 text-white font-bold shadow-lg shadow-blue-500/30">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-cyan-400 to-cyan-600 text-white font-bold shadow-lg shadow-cyan-400/30">
                 D
               </div>
-              <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">{APP_NAME}</span>
+              <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent">{APP_NAME}</span>
             </div>
             <p className="text-sm text-slate-400">
               Semantic code search powered by AI. Store, search, and discover code solutions with intelligent similarity matching.
@@ -134,7 +136,7 @@ export function Footer() {
                 href="https://nextjs.org"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-full bg-gradient-to-r from-slate-700 to-slate-600 border border-slate-500 text-xs font-medium text-slate-200 hover:from-blue-500 hover:to-violet-500 hover:border-blue-400 hover:text-white hover:shadow-lg hover:shadow-blue-500/50 transition-all hover:scale-105"
+                className="px-3 py-1.5 rounded-full bg-gradient-to-r from-slate-700 to-slate-600 border border-slate-500 text-xs font-medium text-slate-200 hover:from-cyan-400 hover:to-cyan-600 hover:border-cyan-400 hover:text-white hover:shadow-lg hover:shadow-cyan-400/50 transition-all hover:scale-105"
               >
                 ⚡ Next.js
               </a>
@@ -142,7 +144,7 @@ export function Footer() {
                 href="https://fastapi.tiangolo.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-full bg-gradient-to-r from-slate-700 to-slate-600 border border-slate-500 text-xs font-medium text-slate-200 hover:from-emerald-500 hover:to-cyan-500 hover:border-emerald-400 hover:text-white hover:shadow-lg hover:shadow-emerald-500/50 transition-all hover:scale-105"
+                className="px-3 py-1.5 rounded-full bg-gradient-to-r from-slate-700 to-slate-600 border border-slate-500 text-xs font-medium text-slate-200 hover:from-green-500 hover:to-cyan-400 hover:border-green-400 hover:text-white hover:shadow-lg hover:shadow-green-500/50 transition-all hover:scale-105"
               >
                 🚀 FastAPI
               </a>
@@ -150,7 +152,7 @@ export function Footer() {
                 href="https://supabase.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-full bg-gradient-to-r from-slate-700 to-slate-600 border border-slate-500 text-xs font-medium text-slate-200 hover:from-violet-500 hover:to-fuchsia-500 hover:border-violet-400 hover:text-white hover:shadow-lg hover:shadow-violet-500/50 transition-all hover:scale-105"
+                className="px-3 py-1.5 rounded-full bg-gradient-to-r from-slate-700 to-slate-600 border border-slate-500 text-xs font-medium text-slate-200 hover:from-purple-500 hover:to-pink-500 hover:border-purple-400 hover:text-white hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105"
               >
                 💾 Supabase
               </a>

@@ -68,7 +68,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
     (filters.dateRange !== 'all' ? 1 : 0);
 
   return (
-    <div className={`bg-slate-800 border border-slate-700 rounded-xl p-4 ${className}`}>
+    <div className={`bg-black border border-slate-700 rounded-xl p-4 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -90,7 +90,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
           )}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 hover:bg-slate-700 rounded transition-colors"
+            className="p-1 hover:bg-slate-900 rounded transition-colors"
           >
             <svg 
               className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
@@ -148,7 +148,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
                     value={option.value}
                     checked={filters.dateRange === option.value}
                     onChange={(e) => setFilters(prev => ({ ...prev, dateRange: e.target.value as any }))}
-                    className="w-4 h-4 text-blue-500 bg-slate-700 border-slate-600 focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 text-blue-500 bg-black border-slate-600 focus:ring-blue-500 focus:ring-2"
                   />
                   <span className="text-sm text-slate-400 group-hover:text-slate-200">{option.label}</span>
                 </label>
@@ -166,7 +166,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
                     type="checkbox"
                     checked={filters.languages.includes(lang.toLowerCase())}
                     onChange={() => toggleLanguage(lang.toLowerCase())}
-                    className="w-4 h-4 text-blue-500 bg-slate-700 border-slate-600 rounded focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 text-blue-500 bg-black border-slate-600 rounded focus:ring-blue-500 focus:ring-2"
                   />
                   <LanguageIcon language={lang.toLowerCase()} size="sm" showLabel />
                 </label>
