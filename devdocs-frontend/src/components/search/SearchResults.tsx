@@ -157,7 +157,7 @@ export function SearchResults({
       {/* Results Grid */}
       <div className="space-y-4">
         {results.map((result) => (
-          <ResultCard key={result.id} result={result} />
+          <ResultCard key={result.solution.id} result={result} />
         ))}
       </div>
     </div>

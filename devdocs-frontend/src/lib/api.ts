@@ -5,6 +5,7 @@
  */
 
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { supabase } from './supabase';
 import {
   Solution,
   SolutionCreate,
@@ -43,11 +44,19 @@ const apiClient: AxiosInstance = axios.create({
 // ============================================================================
 
 /**
- * Add request ID and timestamp to all requests
- * Useful for debugging and request tracking
+ * Add JWT Bearer token and request metadata to all requests
+ * Automatically attaches the access token from Supabase session
  */
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
+    // Get current session from Supabase
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    // Attach Bearer token if session exists
+    if (session?.access_token) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
+    }
+    
     // Add timestamp for latency tracking
     config.headers['X-Request-Time'] = new Date().toISOString();
     
@@ -70,6 +79,7 @@ apiClient.interceptors.request.use(
 
 /**
  * Handle response errors and transform error messages
+ * Includes automatic logout on 401 Unauthorized
  */
 apiClient.interceptors.response.use(
   (response) => {
@@ -79,7 +89,7 @@ apiClient.interceptors.response.use(
     }
     return response;
   },
-  (error: AxiosError<APIError>) => {
+  async (error: AxiosError<APIError>) => {
     // Extract error message
     let errorMessage = 'An unexpected error occurred';
     
@@ -93,6 +103,20 @@ apiClient.interceptors.response.use(
           break;
         case 401:
           errorMessage = 'Unauthorized. Please log in.';
+          
+          // Automatic logout on 401 - token is invalid or expired
+          try {
+            await supabase.auth.signOut();
+            
+            // Redirect to login page with return URL
+            if (typeof window !== 'undefined') {
+              const currentPath = window.location.pathname;
+              const returnUrl = currentPath !== '/' ? `?redirect=${encodeURIComponent(currentPath)}` : '';
+              window.location.href = `/auth/signin${returnUrl}`;
+            }
+          } catch (signOutError) {
+            console.error('Error during automatic logout:', signOutError);
+          }
           break;
         case 403:
           errorMessage = 'Forbidden. You do not have permission.';

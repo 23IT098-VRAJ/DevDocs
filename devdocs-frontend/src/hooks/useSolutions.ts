@@ -12,7 +12,7 @@
 
 import { useQuery, useMutation, useQueryClient, type UseQueryResult, type UseMutationResult } from '@tanstack/react-query';
 import { solutionsApi } from '@/lib/api';
-import type { Solution, SolutionCreate, SolutionUpdate, APIResponse } from '@/lib/types';
+import type { Solution, SolutionCreate, SolutionUpdate } from '@/lib/types';
 
 // ============================================================================
 // QUERY KEYS
@@ -47,10 +47,7 @@ export const solutionKeys = {
 export function useSolutions(): UseQueryResult<Solution[], Error> {
   return useQuery({
     queryKey: solutionKeys.lists(),
-    queryFn: async () => {
-      const response = await solutionsApi.getAll();
-      return response.data;
-    },
+    queryFn: () => solutionsApi.getAll(),
   });
 }
 
@@ -72,10 +69,9 @@ export function useSolution(
 ): UseQueryResult<Solution, Error> {
   return useQuery({
     queryKey: solutionKeys.detail(id || ''),
-    queryFn: async () => {
+    queryFn: () => {
       if (!id) throw new Error('Solution ID is required');
-      const response = await solutionsApi.getById(id);
-      return response.data;
+      return solutionsApi.getById(id);
     },
     enabled: enabled && !!id,
   });
@@ -109,8 +105,7 @@ export function useCreateSolution(): UseMutationResult<Solution, Error, Solution
 
   return useMutation({
     mutationFn: async (data: SolutionCreate) => {
-      const response = await solutionsApi.create(data);
-      return response.data;
+      return await solutionsApi.create(data);
     },
     onSuccess: () => {
       // Invalidate solutions list to refetch with new solution
@@ -147,8 +142,7 @@ export function useUpdateSolution(): UseMutationResult<
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: SolutionUpdate }) => {
-      const response = await solutionsApi.update(id, data);
-      return response.data;
+      return await solutionsApi.update(id, data);
     },
     onSuccess: (data) => {
       // Invalidate the specific solution detail

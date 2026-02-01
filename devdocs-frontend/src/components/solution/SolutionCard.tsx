@@ -78,7 +78,7 @@ export function SolutionCard({
       <div className="flex items-start justify-between gap-4 mb-3">
         <Link 
           href={`/solution/${solution.id}`}
-          className="flex-1 min-w-0 hover:text-blue-600 transition-colors"
+          className="flex-1 min-w-0 hover:text-cyan-400 transition-colors"
         >
           <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
             {solution.title}

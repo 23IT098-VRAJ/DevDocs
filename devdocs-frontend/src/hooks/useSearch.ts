@@ -101,11 +101,7 @@ export function useSearch({
 
   return useQuery({
     queryKey: searchKeys.search(normalizedQuery, limit),
-    queryFn: async () => {
-      // Search API returns results sorted by similarity score (highest first)
-      const response = await searchApi.search(normalizedQuery, limit);
-      return response.data;
-    },
+    queryFn: () => searchApi.search({ q: normalizedQuery, limit }),
     enabled: shouldFetch,
     // Stale time: Keep search results fresh for 1 minute
     // (Users often refine searches quickly)

@@ -60,7 +60,7 @@ export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
 
     // Color variants
     const variantStyles = {
-      primary: 'border-blue-600 border-t-transparent',
+      primary: 'border-cyan-400 border-t-transparent',
       secondary: 'border-gray-600 border-t-transparent',
       white: 'border-white border-t-transparent',
     };

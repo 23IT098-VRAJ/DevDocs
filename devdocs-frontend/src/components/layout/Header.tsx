@@ -12,6 +12,7 @@ import { SearchBar } from '@/components/form/SearchBar';
 import { Button, CommandPalette, useCommandPalette } from '@/components/ui';
 import { APP_NAME } from '@/lib/constants';
 import { BackgroundEffects } from '@/components/layout/BackgroundEffects';
+import { useAuth } from '@/contexts/AuthContext';
 
 // ============================================================================
 // TYPES
@@ -27,7 +28,6 @@ interface NavLink {
 // ============================================================================
 
 const NAV_LINKS: NavLink[] = [
-  { href: '/dashboard', label: 'Dashboard' },
   { href: '/search', label: 'Search' },
   { href: '/solution', label: 'Browse' },
 ];
@@ -40,6 +40,7 @@ export function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isOpen, open, close } = useCommandPalette();
+  const { user, signOut, loading } = useAuth();
 
   // Check if link is active
   function isActive(href: string): boolean {
@@ -95,6 +96,27 @@ export function Header() {
               <Button variant="primary" size="sm" className="animate-pulse hover:animate-none">
                 + New Solution
               </Button>
+            
+            {/* Auth Buttons */}
+            {!loading && (
+              user ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-slate-300">{user.email}</span>
+                  <button
+                    onClick={() => signOut()}
+                    className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white border border-slate-600 hover:border-slate-500 rounded-lg transition-all"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link href="/auth/signin">
+                  <Button variant="secondary" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+              )
+            )}
             </Link>
           </div>
 
@@ -125,7 +147,7 @@ export function Header() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`block px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive(link.href)
-                    ? 'bg-blue-500/20 text-blue-400'
+                    ? 'bg-cyan-500/20 text-cyan-400'
                     : 'text-slate-300 hover:bg-slate-700 hover:text-blue-400'
                 }`}
               >
@@ -133,6 +155,32 @@ export function Header() {
               </Link>
             ))}
 
+
+            {/* Mobile Auth */}
+            {!loading && (
+              <div className="px-4 pt-2">
+                {user ? (
+                  <div className="space-y-2">
+                    <div className="text-sm text-slate-400 px-2">{user.email}</div>
+                    <button
+                      onClick={() => {
+                        signOut();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-2 text-sm font-medium text-slate-300 border border-slate-600 rounded-lg"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <Link href="/auth/signin" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="secondary" size="md" fullWidth>
+                      Sign In
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            )}
             {/* Mobile Search */}
             <div className="px-4 pt-2">
               <button

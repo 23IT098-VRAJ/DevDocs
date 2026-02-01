@@ -5,30 +5,46 @@
 
 'use client';
 
+import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSolution } from '@/hooks/useSolutions';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { SolutionForm } from '@/components/form/SolutionForm';
 import { Card, Spinner } from '@/components/ui';
-import { BackgroundEffects } from '@/components/layout/BackgroundEffects';
+import { Home, ChevronRight, HelpCircle } from 'lucide-react';
+import GlassmorphicNavbar from '@/components/layout/GlassmorphicNavbar';
 
 interface EditSolutionPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function EditSolutionPage({ params }: EditSolutionPageProps) {
+  const { id } = use(params);
+  const { loading: authLoading } = useRequireAuth();
   const router = useRouter();
-  const { data: solution, isLoading, error } = useSolution(params.id);
+  const { data: solution, isLoading, error } = useSolution(id);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   function handleSuccess() {
-    router.push(`/solution/${params.id}`);
+    router.push(`/solution/${id}`);
   }
 
   if (isLoading) {
     return (
-      <div className="relative">
-        <BackgroundEffects opacity="low" />
-        <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh] relative z-10">
+      <div className="min-h-screen bg-black">
+        <GlassmorphicNavbar />
+        <div className="pt-24 px-4 py-8 flex justify-center items-center min-h-[60vh]">
           <Spinner size="lg" />
         </div>
       </div>
@@ -37,17 +53,20 @@ export default function EditSolutionPage({ params }: EditSolutionPageProps) {
 
   if (error || !solution) {
     return (
-      <div className="relative">
-        <BackgroundEffects opacity="low" />
-        <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className="min-h-screen bg-black">
+        <GlassmorphicNavbar />
+        <div className="pt-24 px-4 py-8 max-w-7xl mx-auto">
         <Card className="p-12 text-center">
           <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Solution Not Found</h2>
           <p className="text-gray-600 mb-6">Cannot edit a solution that doesn't exist.</p>
-          <Link href="/dashboard">
-            <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Back to Dashboard</button>
+          {/* <Link href="/dashboard">
+            <button className="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Back to Dashboard</button>
+          </Link> */}
+          <Link href="/">
+            <button className="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Back to Home</button>
           </Link>
         </Card>
         </div>
@@ -56,25 +75,76 @@ export default function EditSolutionPage({ params }: EditSolutionPageProps) {
   }
 
   return (
-    <div className="relative">
-      <BackgroundEffects opacity="low" />
-      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
-      {/* Header */}
-      <div className="mb-8">
-        <Link href={`/solution/${params.id}`} className="text-blue-600 hover:text-blue-700 flex items-center gap-1 mb-4">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Solution
-        </Link>
-        <h1 className="text-4xl font-bold text-gray-900 mb-3">Edit Solution</h1>
-        <p className="text-lg text-gray-600">Update your code solution</p>
+    <div className="min-h-screen bg-black">
+      <GlassmorphicNavbar />
+      
+      <div className="pt-20 pb-24">
+        <div className="max-w-5xl mx-auto px-4 py-8">
+          {/* Breadcrumbs */}
+          <div className="flex items-center gap-2 mb-6 text-sm">
+            <Link href="/" className="flex items-center gap-1 text-white/60 hover:text-white transition-colors">
+              <Home size={16} />
+              Home
+            </Link>
+            <ChevronRight size={14} className="text-white/40" />
+            <Link href="/solution" className="text-white/60 hover:text-white transition-colors">
+              Solutions
+            </Link>
+            <ChevronRight size={14} className="text-white/40" />
+            <Link href={`/solution/${id}`} className="text-white/60 hover:text-white transition-colors truncate max-w-[150px]">
+              {solution.title}
+            </Link>
+            <ChevronRight size={14} className="text-white/40" />
+            <span className="text-[#07b9d5]">Edit</span>
+          </div>
+
+          {/* Page Heading */}
+          <div className="flex flex-wrap justify-between items-start gap-4 mb-8">
+            <div className="flex-1 min-w-[300px]">
+              <h1 className="text-white text-4xl font-black tracking-tight mb-2">
+                Edit Solution
+              </h1>
+              <p className="text-white/60 text-base">
+                Update your code snippet and documentation.
+              </p>
+            </div>
+            <button className="flex items-center gap-2 text-white/60 hover:text-white transition-colors text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/5">
+              <HelpCircle size={18} />
+              Formatting Guide
+            </button>
+          </div>
+
+          {/* Form */}
+          <div className="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl">
+            <SolutionForm
+              solution={solution}
+              mode="edit"
+              onSuccess={handleSuccess}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Form */}
-      <Card className="p-8">
-        <SolutionForm mode="edit" solution={solution} onSuccess={handleSuccess} />
-      </Card>
+      {/* Sticky Footer Actions */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/95 backdrop-blur-md px-4 py-4">
+        <div className="max-w-5xl mx-auto flex justify-between items-center gap-4">
+          <button 
+            onClick={() => router.back()}
+            className="px-6 py-2.5 rounded-lg border border-white/10 text-white font-medium hover:bg-white/5 transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            form="solution-form"
+            className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-black font-bold hover:shadow-lg hover:shadow-[#07b9d5]/50 transition-all flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Update Solution
+          </button>
+        </div>
       </div>
     </div>
   );

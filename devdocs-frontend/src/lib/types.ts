@@ -8,6 +8,73 @@
 // CORE DATA MODELS
 // ============================================================================
 
+// ============================================================================
+// AUTHENTICATION MODELS
+// ============================================================================
+
+/**
+ * User - Authenticated user profile
+ * Matches the backend users table schema
+ */
+export interface User {
+  /** Unique identifier (UUID) */
+  id: string;
+  
+  /** Supabase auth user ID (UUID) */
+  auth_id: string;
+  
+  /** User email address */
+  email: string;
+  
+  /** User's full name */
+  full_name: string;
+  
+  /** Optional avatar URL */
+  avatar_url?: string;
+  
+  /** Email verification status */
+  is_verified?: boolean;
+  
+  /** ISO timestamp of account creation */
+  created_at: string;
+  
+  /** ISO timestamp of last update */
+  updated_at: string;
+  
+  /** ISO timestamp of last login */
+  last_login_at?: string;
+}
+
+/**
+ * Session - Authentication session with JWT tokens
+ * Managed by Supabase Auth
+ */
+export interface Session {
+  /** JWT access token for API authentication */
+  access_token: string;
+  
+  /** Refresh token for obtaining new access tokens */
+  refresh_token: string;
+  
+  /** Token expiration timestamp (Unix epoch in seconds) */
+  expires_at: number;
+  
+  /** Authenticated user */
+  user: User;
+}
+
+/**
+ * ProfileUpdate - Input model for updating user profile
+ * Used in profile edit forms (PUT /api/auth/me)
+ */
+export interface ProfileUpdate {
+  /** Updated full name */
+  full_name?: string;
+  
+  /** Updated avatar URL */
+  avatar_url?: string;
+}
+
 /**
  * Solution - Main data model representing a coding solution
  * Matches the backend solutions table schema exactly

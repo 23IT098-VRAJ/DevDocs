@@ -74,7 +74,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold text-slate-200">Filters</h2>
           {activeFilterCount > 0 && (
-            <span className="px-2 py-0.5 text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full">
+            <span className="px-2 py-0.5 text-xs font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-full">
               {activeFilterCount}
             </span>
           )}
@@ -83,7 +83,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
           {activeFilterCount > 0 && (
             <button
               onClick={clearFilters}
-              className="text-xs text-slate-400 hover:text-blue-400 transition-colors"
+              className="text-xs text-slate-400 hover:text-cyan-400 transition-colors"
             >
               Clear all
             </button>
@@ -122,7 +122,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
                     value={option.value}
                     checked={filters.sortBy === option.value}
                     onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value as any }))}
-                    className="w-4 h-4 text-blue-500 bg-slate-700 border-slate-600 focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 text-cyan-500 bg-slate-700 border-slate-600 focus:ring-cyan-500 focus:ring-2"
                   />
                   <span className="text-sm text-slate-400 group-hover:text-slate-200">{option.label}</span>
                 </label>
@@ -148,7 +148,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
                     value={option.value}
                     checked={filters.dateRange === option.value}
                     onChange={(e) => setFilters(prev => ({ ...prev, dateRange: e.target.value as any }))}
-                    className="w-4 h-4 text-blue-500 bg-black border-slate-600 focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 text-cyan-500 bg-black border-slate-600 focus:ring-cyan-500 focus:ring-2"
                   />
                   <span className="text-sm text-slate-400 group-hover:text-slate-200">{option.label}</span>
                 </label>
@@ -166,7 +166,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
                     type="checkbox"
                     checked={filters.languages.includes(lang.toLowerCase())}
                     onChange={() => toggleLanguage(lang.toLowerCase())}
-                    className="w-4 h-4 text-blue-500 bg-black border-slate-600 rounded focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 text-cyan-500 bg-black border-slate-600 rounded focus:ring-cyan-500 focus:ring-2"
                   />
                   <LanguageIcon language={lang.toLowerCase()} size="sm" showLabel />
                 </label>
@@ -185,7 +185,7 @@ export function FilterSidebar({ onFilterChange, availableTags = [], className = 
                     onClick={() => toggleTag(tag)}
                     className={`transition-all ${
                       filters.tags.includes(tag)
-                        ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-800'
+                        ? 'ring-2 ring-cyan-500 ring-offset-2 ring-offset-slate-800'
                         : ''
                     }`}
                   >

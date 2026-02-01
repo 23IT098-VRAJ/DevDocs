@@ -1,245 +1,281 @@
-/**
- * Sign Up Page
- * User registration page
- */
-
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, FormEvent } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Button, Card } from '@/components/ui';
-import { BackgroundEffects } from '@/components/layout/BackgroundEffects';
-import { APP_NAME } from '@/lib/constants';
+import Link from 'next/link';
+import { AuthHeader } from '@/components/layout/AuthHeader';
 
 export default function SignUpPage() {
-  const router = useRouter();
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useAuth();
+  const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
+    setLoading(true);
 
     // Validation
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      setLoading(false);
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setLoading(false);
       return;
     }
-
-    setIsLoading(true);
 
     try {
-      // TODO: Implement actual registration
-      // For now, just simulate a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { error } = await signUp(email, password, fullName);
       
-      // Redirect to dashboard after successful registration
-      router.push('/dashboard');
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      // Successful signup
+      setSuccess('Account created successfully! Redirecting...');
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
     } catch (err) {
-      setError('Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+      setError('An unexpected error occurred');
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center">
-      <BackgroundEffects opacity="medium" />
+    <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden py-12">
+      <AuthHeader />
       
-      <div className="container mx-auto px-4 py-12 relative z-10">
-        <div className="max-w-md mx-auto">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center space-x-2 hover:opacity-90 transition-opacity group">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-cyan-600 text-white text-2xl font-bold shadow-2xl shadow-cyan-400/70 group-hover:shadow-cyan-400/90 transition-shadow">
-                D
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent">{APP_NAME}</span>
-            </Link>
-          </div>
+      {/* Animated background with grid */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_110%)]"></div>
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        
+        {/* Floating code snippets */}
+        <div className="absolute top-24 right-10 text-cyan-500/20 font-mono text-sm animate-float">class User {'{}'}</div>
+        <div className="absolute top-1/3 left-16 text-cyan-500/20 font-mono text-sm animate-float" style={{animationDelay: '1.5s'}}>async register()</div>
+        <div className="absolute bottom-40 right-20 text-cyan-500/20 font-mono text-sm animate-float" style={{animationDelay: '2s'}}>export default</div>
+        <div className="absolute bottom-24 left-12 text-cyan-500/20 font-mono text-sm animate-float" style={{animationDelay: '0.5s'}}>useState()</div>
+      </div>
 
-          {/* Sign Up Card */}
-          <Card className="p-8 bg-black/95 backdrop-blur-xl border-2 border-cyan-400/30 shadow-2xl shadow-cyan-400/20">
-            <div className="mb-6 text-center">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent mb-2">
-                Create Account
-              </h1>
-              <p className="text-slate-400">Start building your code library</p>
-            </div>
+      <div className="relative z-10 w-full max-w-md px-6">
+        {/* Header with glow effect */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-3 relative inline-block">
+            Join DevDocs
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-lg -z-10"></div>
+          </h2>
+          <p className="text-gray-400 text-sm">Start organizing your code solutions today</p>
+        </div>
 
+        {/* Sign Up Form with pure black background */}
+        <div className="bg-black backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-cyan-500/30 p-8 relative overflow-hidden">
+          {/* Inner glow */}
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5 pointer-events-none"></div>
+          <div className="absolute -top-24 -left-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl"></div>
+          <form onSubmit={handleSubmit} className="space-y-4 relative">
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+              <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 backdrop-blur-sm animate-in slide-in-from-top">
                 <p className="text-red-400 text-sm flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                   {error}
                 </p>
               </div>
             )}
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Name Field */}
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  placeholder="John Doe"
-                  className="w-full px-4 py-3 bg-black border-2 border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all"
-                />
+            {/* Success Message */}
+            {success && (
+              <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-4 backdrop-blur-sm animate-in slide-in-from-top">
+                <p className="text-green-400 text-sm flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  {success}
+                </p>
               </div>
+            )}
 
-              {/* Email Field */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-3 bg-black border-2 border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all"
-                />
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="••••••••"
-                  minLength={8}
-                  className="w-full px-4 py-3 bg-black border-2 border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all"
-                />
-                <p className="mt-1 text-xs text-slate-500">Must be at least 8 characters</p>
-              </div>
-
-              {/* Confirm Password Field */}
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-300 mb-2">
-                  Confirm Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 bg-black border-2 border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all"
-                />
-              </div>
-
-              {/* Terms Checkbox */}
-              <div className="flex items-start gap-2">
-                <input
-                  id="terms"
-                  type="checkbox"
-                  required
-                  className="mt-1 w-4 h-4 bg-black border-2 border-slate-700 rounded text-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
-                />
-                <label htmlFor="terms" className="text-sm text-slate-400">
-                  I agree to the{' '}
-                  <Link href="/terms" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link href="/privacy" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-                    Privacy Policy
-                  </Link>
-                </label>
-              </div>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full shadow-xl shadow-cyan-400/30 hover:shadow-2xl hover:shadow-cyan-400/50"
-                isLoading={isLoading}
-              >
-                Create Account
-              </Button>
-            </form>
-
-            {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-700"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-black text-slate-500">or</span>
-              </div>
+            {/* Full Name Field */}
+            <div className="relative">
+              <label htmlFor="fullName" className="block text-sm font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Full Name
+              </label>
+              <input
+                id="fullName"
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-black border-2 border-gray-800 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none text-white placeholder-gray-600 transition-all hover:border-gray-700"
+                placeholder="John Doe"
+                disabled={loading}
+                suppressHydrationWarning
+              />
             </div>
 
-            {/* OAuth Buttons */}
-            <div className="space-y-3">
-              <button
-                type="button"
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black border-2 border-slate-700 rounded-lg text-slate-300 hover:border-slate-600 hover:bg-slate-900 transition-all"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
+            {/* Email Field */}
+            <div className="relative">
+              <label htmlFor="email" className="block text-sm font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                 </svg>
-                Continue with Google
-              </button>
-              <button
-                type="button"
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black border-2 border-slate-700 rounded-lg text-slate-300 hover:border-slate-600 hover:bg-slate-900 transition-all"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                </svg>
-                Continue with GitHub
-              </button>
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-black border-2 border-gray-800 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none text-white placeholder-gray-600 transition-all hover:border-gray-700"
+                placeholder="you@example.com"
+                disabled={loading}
+                suppressHydrationWarning
+              />
             </div>
 
-            {/* Sign In Link */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-slate-400">
-                Already have an account?{' '}
-                <Link href="/auth/signin" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
-                  Sign in
-                </Link>
+            {/* Password Field */}
+            <div className="relative">
+              <label htmlFor="password" className="block text-sm font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full px-4 py-3 bg-black border-2 border-gray-800 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none text-white placeholder-gray-600 transition-all hover:border-gray-700"
+                placeholder="••••••••"
+                disabled={loading}
+                suppressHydrationWarning
+              />
+              <p className="mt-1.5 text-xs text-gray-500 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                Must be at least 6 characters
               </p>
             </div>
-          </Card>
 
-          {/* Back to Home */}
-          <div className="mt-6 text-center">
-            <Link href="/" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors inline-flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            {/* Confirm Password Field */}
+            <div className="relative">
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full px-4 py-3 bg-black border-2 border-gray-800 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none text-white placeholder-gray-600 transition-all hover:border-gray-700"
+                placeholder="••••••••"
+                disabled={loading}
+                suppressHydrationWarning
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 px-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group mt-6"
+              suppressHydrationWarning
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity"></div>
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Creating account...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  Create Account
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+              )}
+            </button>
+          </form>
+
+          {/* Sign In Link */}
+          <div className="mt-6 text-center relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-800"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-black text-gray-500">Already have an account?</span>
+            </div>
+          </div>
+          <div className="mt-4 text-center">
+            <Link href="/auth/signin" className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-semibold transition-colors group">
+              Sign in here
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-              Back to home
             </Link>
+          </div>
+        </div>
+
+        {/* Benefits */}
+        <div className="mt-8 space-y-3">
+          <div className="flex items-center gap-3 text-sm text-gray-400">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+              <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <span>Instant semantic search across all your code</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm text-gray-400">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+              <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <span>Secure cloud storage with encryption</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm text-gray-400">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+              <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+              </svg>
+            </div>
+            <span>AI-powered code organization</span>
           </div>
         </div>
       </div>

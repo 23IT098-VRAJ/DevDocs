@@ -61,7 +61,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
       warning: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
       error: 'bg-red-500/20 text-red-400 border border-red-500/30',
       info: 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30',
-      outline: 'border border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800 hover:border-blue-500',
+      outline: 'border border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800 hover:border-cyan-500',
     };
 
     // Size styles

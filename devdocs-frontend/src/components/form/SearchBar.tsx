@@ -126,7 +126,7 @@ export function SearchBar({
     if (onSelect) {
       onSelect(result);
     } else {
-      router.push(`/solution/${result.id}`);
+      router.push(`/solution/${result.solution.id}`);
     }
   }
 
@@ -147,7 +147,7 @@ export function SearchBar({
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="pr-20 py-3 text-base bg-slate-700/50 border border-slate-600 text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 hover:bg-slate-600/50 transition-colors"
+          className="pr-20 py-3 text-base bg-slate-700/50 border border-slate-600 text-slate-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 hover:bg-slate-600/50 transition-colors"
           style={{
             backgroundClip: 'padding-box',
           }}
@@ -176,43 +176,43 @@ export function SearchBar({
         <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto">
           {results.map((result, index) => (
             <button
-              key={result.id}
+              key={result.solution.id}
               onClick={() => handleSelectResult(result)}
               className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 ${
-                index === selectedIndex ? 'bg-blue-50' : ''
+                index === selectedIndex ? 'bg-cyan-400/10' : ''
               }`}
             >
               {/* Title and Similarity */}
               <div className="flex items-start justify-between gap-2 mb-1">
                 <h4 className="font-medium text-gray-900 line-clamp-1">
-                  {result.title}
+                  {result.solution.title}
                 </h4>
                 <Badge
-                  variant={getSimilarityColor(result.similarity_score)}
+                  variant={getSimilarityColor(result.similarity) as any}
                   size="sm"
                 >
-                  {Math.round(result.similarity_score * 100)}%
+                  {Math.round(result.similarity * 100)}%
                 </Badge>
               </div>
 
               {/* Description */}
               <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                {truncateText(result.description, 120)}
+                {truncateText(result.solution.description, 120)}
               </p>
 
               {/* Language and Tags */}
               <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant="info" size="sm">
-                  {result.language}
+                  {result.solution.language}
                 </Badge>
-                {result.tags.slice(0, 3).map((tag) => (
+                {result.solution.tags.slice(0, 3).map((tag) => (
                   <Badge key={tag} variant="outline" size="sm">
                     {tag}
                   </Badge>
                 ))}
-                {result.tags.length > 3 && (
+                {result.solution.tags.length > 3 && (
                   <span className="text-xs text-gray-500">
-                    +{result.tags.length - 3} more
+                    +{result.solution.tags.length - 3} more
                   </span>
                 )}
               </div>

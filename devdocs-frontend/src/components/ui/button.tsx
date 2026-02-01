@@ -78,13 +78,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ),
       outline: cn(
         'border-2 border-slate-600 bg-transparent text-slate-300',
-        'hover:bg-slate-800 hover:border-blue-500 hover:text-blue-400',
-        'focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900',
+        'hover:bg-slate-800 hover:border-cyan-500 hover:text-cyan-400',
+        'focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-slate-900',
         'disabled:hover:bg-transparent disabled:hover:border-slate-600'
       ),
       ghost: cn(
         'bg-transparent text-slate-300',
-        'hover:bg-slate-800 hover:text-blue-400',
+        'hover:bg-slate-800 hover:text-cyan-400',
         'focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900',
         'disabled:hover:bg-transparent'
       ),

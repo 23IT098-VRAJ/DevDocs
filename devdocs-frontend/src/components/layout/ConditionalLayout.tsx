@@ -15,40 +15,35 @@ interface ConditionalLayoutProps {
 export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
   
-  // Routes that should NOT show Header/Footer (landing page only)
-  const noLayoutRoutes = ['/'];
+  // Routes that should NOT show Header/Footer (they have their own glassmorphic navbar)
+  const noLayoutRoutes = [
+    '/', 
+    '/auth/signin', 
+    '/auth/signup', 
+    '/dashboard',
+    '/search',
+    '/solution',
+    '/profile',
+  ];
   
-  // Routes that should NOT show Header (auth pages, but still show footer)
-  const noHeaderRoutes = ['/auth/signin', '/auth/signup', '/auth/forgot-password'];
-  
-  const shouldShowHeader = !noLayoutRoutes.includes(pathname) && !noHeaderRoutes.includes(pathname);
-  const shouldShowFooter = !noLayoutRoutes.includes(pathname);
+  // Check if current path starts with any no-layout route
+  const shouldHideLayout = noLayoutRoutes.some(route => 
+    pathname === route || pathname.startsWith(route + '/')
+  );
 
-  // Landing page layout (no header/footer, they're built into the page)
-  if (noLayoutRoutes.includes(pathname)) {
+  // Routes with glassmorphic navbar (no header/footer needed)
+  if (shouldHideLayout) {
     return <>{children}</>;
-  }
-
-  // Auth pages layout (no header, yes footer)
-  if (noHeaderRoutes.includes(pathname)) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
-      </div>
-    );
   }
 
   // Default layout (header + content + footer)
   return (
     <div className="flex min-h-screen flex-col">
-      {shouldShowHeader && <Header />}
+      <Header />
       <main className="flex-1">
         {children}
       </main>
-      {shouldShowFooter && <Footer />}
+      <Footer />
     </div>
   );
 }

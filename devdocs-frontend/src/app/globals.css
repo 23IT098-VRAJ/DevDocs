@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
 :root {
+  /* Fonts */
+  --font-sans: 'Exo 2', sans-serif;
+  
+  /* Navbar Responsive Scaling */
+  --navbar-scale: 1;
+  
   /* Flutter Theme - Dark Mode Colors */
   /* Primary Cyan Colors */
   --color-primary: #25d1f4;
@@ -70,17 +76,58 @@
   --foreground: #ffffff;
 }
 
+/* Responsive Navbar Scaling - Scales the entire navbar proportionally */
+@media (max-width: 1536px) {
+  :root {
+    --navbar-scale: 0.95;
+  }
+}
+
+@media (max-width: 1280px) {
+  :root {
+    --navbar-scale: 0.9;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --navbar-scale: 0.85;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --navbar-scale: 0.8;
+  }
+}
+
+/* Apply Exo 2 font globally */
+body {
+  font-family: var(--font-sans);
+}
+
+/* Ensure sans utility uses Exo 2 */
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+@media (max-width: 640px) {
+  :root {
+    --navbar-scale: 0.75;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Exo 2', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 body {
   background: var(--background-deep);
   color: var(--text-primary);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* Gradient Animation */
@@ -399,3 +446,28 @@ pre[class*="language-"] {
 .token.entity {
   cursor: help;
 }
+
+/* Floating animation for auth pages */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateY(-20px) rotate(2deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-40px) rotate(-2deg);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(-20px) rotate(1deg);
+    opacity: 0.5;
+  }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+

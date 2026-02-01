@@ -109,7 +109,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search code solutions..."
-                className="w-full pl-10 pr-4 py-3 bg-black border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 hover:bg-slate-900 transition-colors"
+                className="w-full pl-10 pr-4 py-3 bg-black border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 hover:bg-slate-900 transition-colors"
               />
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-semibold text-slate-400 bg-slate-900 border border-slate-600 rounded">
                 ESC

@@ -40,12 +40,13 @@ export function ResultCard({
   className = '',
   showFullCode = false,
 }: ResultCardProps) {
-  const similarityPercent = Math.round(result.similarity_score * 100);
-  const similarityLevel = getSimilarityLevel(result.similarity_score);
-  const similarityColor = getSimilarityColor(result.similarity_score);
+  const solution = result.solution;
+  const similarityPercent = Math.round(result.similarity * 100);
+  const similarityLevel = getSimilarityLevel(result.similarity);
+  const similarityColor = getSimilarityColor(result.similarity);
 
   return (
-    <Link href={`/solution/${result.id}`}>
+    <Link href={`/solution/${solution.id}`}>
       <Card
         variant="outlined"
         padding="md"
@@ -56,15 +57,15 @@ export function ResultCard({
         <div className="flex items-start justify-between gap-4 mb-3">
           <div className="flex-1 min-w-0">
             <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
-              {result.title}
+              {solution.title}
             </h3>
             <p className="text-sm text-gray-600 line-clamp-2">
-              {result.description}
+              {solution.description}
             </p>
           </div>
           
           <div className="flex flex-col items-end gap-2 shrink-0">
-            <Badge variant={similarityColor} size="lg">
+            <Badge variant={similarityColor as any} size="lg">
               {similarityPercent}% Match
             </Badge>
             <span className="text-xs text-gray-500 font-medium">
@@ -76,14 +77,14 @@ export function ResultCard({
         {/* Code Preview */}
         <div className="bg-slate-900 rounded-md p-3 mb-3 overflow-hidden relative group">
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <CopyButton text={result.code} />
+            <CopyButton text={solution.code} />
           </div>
           <pre className="text-sm text-slate-200 font-mono overflow-x-auto">
             <code>
-              {showFullCode ? result.code : truncateText(result.code, 200)}
+              {showFullCode ? solution.code : truncateText(solution.code, 200)}
             </code>
           </pre>
-          {!showFullCode && result.code.length > 200 && (
+          {!showFullCode && solution.code.length > 200 && (
             <p className="text-xs text-slate-400 mt-2">Click to view full code...</p>
           )}
         </div>
@@ -91,21 +92,21 @@ export function ResultCard({
         {/* Footer: Language, Tags, Date */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
-            <LanguageIcon language={result.language} size="sm" />
+            <LanguageIcon language={solution.language} size="sm" />
             
-            {result.tags.slice(0, 4).map((tag) => (
+            {solution.tags.slice(0, 4).map((tag) => (
               <ColorTag key={tag} tag={tag} size="sm" />
             ))}
             
-            {result.tags.length > 4 && (
+            {solution.tags.length > 4 && (
               <span className="text-xs text-slate-400">
-                +{result.tags.length - 4} more
+                +{solution.tags.length - 4} more
               </span>
             )}
           </div>
           
           <span className="text-xs text-gray-500">
-            {formatDate(result.created_at)}
+            {formatDate(solution.created_at)}
           </span>
         </div>
       </Card>

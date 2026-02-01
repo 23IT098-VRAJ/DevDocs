@@ -194,53 +194,103 @@ export function SolutionForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-6 ${className}`}>
-      {/* Title */}
-      <Input
-        label="Title"
-        value={formData.title}
-        onChange={(e) => handleChange('title', e.target.value)}
-        hasError={!!errors.title}
-        errorMessage={errors.title}
-        helperText={`${formData.title.length}/${VALIDATION.TITLE.MAX} characters`}
-        required
-        placeholder="e.g., Binary Search Algorithm in Python"
-      />
-
-      {/* Description */}
-      <Textarea
-        label="Description"
-        value={formData.description}
-        onChange={(e) => handleChange('description', e.target.value)}
-        hasError={!!errors.description}
-        errorMessage={errors.description}
-        showCount
-        maxLength={VALIDATION.DESCRIPTION.MAX}
-        required
-        placeholder="Describe what this solution does and when to use it..."
-        rows={4}
-      />
-
-      {/* Code */}
-      <div>
-        <Textarea
-          label="Code"
-          value={formData.code}
-          onChange={(e) => handleChange('code', e.target.value)}
-          hasError={!!errors.code}
-          errorMessage={errors.code}
-          showCount
-          maxLength={VALIDATION.CODE.MAX}
-          required
-          placeholder="Paste your code here..."
-          rows={12}
-          className="font-mono text-sm"
+    <form id="solution-form" onSubmit={handleSubmit} className={`space-y-8 ${className}`}>
+      {/* Title Input - Large */}
+      <div className="flex flex-col gap-2">
+        <label className="text-white text-base font-medium">
+          Solution Title <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={formData.title}
+          onChange={(e) => handleChange('title', e.target.value)}
+          placeholder="e.g., Asynchronous API Fetching in React"
+          className="w-full rounded-lg text-white bg-black border border-white/10 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] h-14 px-4 text-lg font-medium placeholder:text-white/40 transition-all"
         />
+        {errors.title && (
+          <p className="text-sm text-red-400">{errors.title}</p>
+        )}
+        <p className="text-xs text-white/40">{formData.title.length}/{VALIDATION.TITLE.MAX} characters</p>
+      </div>
+
+      {/* Description Input - With Markdown Note */}
+      <div className="flex flex-col gap-2">
+        <label className="text-white text-base font-medium flex justify-between">
+          <span>Context / Description <span className="text-red-500">*</span></span>
+          <span className="text-xs text-white/50 font-normal">Markdown supported</span>
+        </label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => handleChange('description', e.target.value)}
+          placeholder="Explain the context, prerequisites, and how this solution works..."
+          className="w-full rounded-lg text-white bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] min-h-[140px] p-4 text-base placeholder:text-white/40 transition-all resize-y"
+          rows={6}
+        />
+        {errors.description && (
+          <p className="text-sm text-red-400">{errors.description}</p>
+        )}
+        <p className="text-xs text-white/40">{formData.description.length}/{VALIDATION.DESCRIPTION.MAX} characters</p>
+      </div>
+
+      {/* Code Editor */}
+      <div className="flex flex-col gap-2">
+        <label className="text-white text-base font-medium flex justify-between items-center">
+          <span>Code Implementation <span className="text-red-500">*</span></span>
+          <button
+            type="button"
+            className="text-xs flex items-center gap-1 text-[#07b9d5] bg-[#07b9d5]/10 hover:bg-[#07b9d5]/20 px-3 py-1.5 rounded-lg border border-[#07b9d5]/20 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+            Format
+          </button>
+        </label>
+        
+        {/* Code Editor Container */}
+        <div className="w-full rounded-xl overflow-hidden border border-white/10 bg-black/80 backdrop-blur-sm shadow-xl flex flex-col group focus-within:ring-1 focus-within:ring-[#07b9d5]/50 focus-within:border-[#07b9d5]/50 transition-all">
+          {/* Editor Toolbar */}
+          <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
+            <div className="flex items-center gap-2 text-white/60 text-sm">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+              </svg>
+              <span className="font-mono">code.{formData.language === 'javascript' ? 'js' : formData.language === 'typescript' ? 'ts' : formData.language === 'python' ? 'py' : 'txt'}</span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                title="Copy code"
+                className="text-white/40 hover:text-white p-1.5 rounded hover:bg-white/5 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          {/* Code Textarea */}
+          <div className="relative">
+            <textarea
+              value={formData.code}
+              onChange={(e) => handleChange('code', e.target.value)}
+              placeholder="Paste your code here..."
+              className="w-full h-[300px] bg-transparent border-none resize-none focus:ring-0 p-4 text-white font-mono text-sm leading-6 placeholder:text-white/30"
+              spellCheck="false"
+            />
+          </div>
+        </div>
+        
+        {errors.code && (
+          <p className="text-sm text-red-400">{errors.code}</p>
+        )}
+        <p className="text-xs text-white/40">{formData.code.length}/{VALIDATION.CODE.MAX} characters</p>
         
         {/* Live Code Preview */}
         {formData.code.trim() && (
           <div className="mt-4">
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Live Preview
             </label>
             <CodePreview 
@@ -252,78 +302,88 @@ export function SolutionForm({
         )}
       </div>
 
-      {/* Language Dropdown */}
-      <div>
-        <label className="block text-sm font-medium text-slate-300 mb-2">
-          Programming Language <span className="text-red-500">*</span>
-        </label>
-        <select
-          value={formData.language}
-          onChange={(e) => handleChange('language', e.target.value)}
-          className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 text-slate-100 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 hover:bg-slate-600/50 transition-colors"
-        >
-          {LANGUAGES.map((lang) => (
-            <option key={lang} value={lang.toLowerCase()} className="bg-slate-800 text-slate-100">
-              {lang}
-            </option>
-          ))}
-        </select>
-        {errors.language && (
-          <p className="mt-1 text-sm text-red-600">{errors.language}</p>
-        )}
-      </div>
+      {/* Metadata Row */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Language Dropdown */}
+        <div className="col-span-1 md:col-span-3 flex flex-col gap-2">
+          <label className="text-white text-base font-medium">
+            Language <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <select
+              value={formData.language}
+              onChange={(e) => handleChange('language', e.target.value)}
+              className="w-full appearance-none rounded-lg text-white bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] h-12 px-4 pr-10 text-base cursor-pointer transition-all [&>option]:bg-black [&>option]:text-white"
+            >
+              {LANGUAGES.map((lang) => (
+                <option key={lang} value={lang.toLowerCase()} className="bg-black text-white">
+                  {lang}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white/40">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+          {errors.language && (
+            <p className="text-sm text-red-400">{errors.language}</p>
+          )}
+        </div>
 
-      {/* Tags */}
-      <div>
-        <Input
-          label="Tags"
-          value={formData.tags}
-          onChange={(e) => handleChange('tags', e.target.value)}
-          hasError={!!errors.tags}
-          errorMessage={errors.tags}
-          helperText="Separate tags with commas (e.g., algorithm, sorting, array)"
-          required
-          placeholder="algorithm, data-structure, sorting"
-        />
-        
-        {/* Tags Preview */}
-        {formData.tags.trim() && (
-          <div className="mt-2 flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-gray-600">Preview:</span>
+        {/* Framework Input */}
+        <div className="col-span-1 md:col-span-3 flex flex-col gap-2">
+          <label className="text-white text-base font-medium">Framework / Lib</label>
+          <input
+            type="text"
+            placeholder="e.g. React 18"
+            className="w-full rounded-lg text-white bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] h-12 px-4 text-base placeholder:text-white/40 transition-all"
+          />
+        </div>
+
+        {/* Tags Input with Chips */}
+        <div className="col-span-1 md:col-span-6 flex flex-col gap-2">
+          <label className="text-white text-base font-medium">
+            Tags <span className="text-red-500">*</span>
+          </label>
+          <div className="w-full rounded-lg border border-white/10 bg-white/5 focus-within:border-[#07b9d5] focus-within:ring-1 focus-within:ring-[#07b9d5] min-h-[3rem] px-2 py-1.5 flex flex-wrap items-center gap-2 transition-all cursor-text">
+            {/* Tag Chips */}
             {formData.tags
               .split(',')
               .map(t => t.trim())
               .filter(t => t.length > 0)
               .map((tag, index) => (
-                <Badge key={index} variant="outline" size="sm">
-                  {tag}
-                </Badge>
+                <div key={index} className="bg-[#07b9d5]/20 border border-[#07b9d5]/30 rounded-md px-2 py-1 flex items-center gap-1.5 group">
+                  <span className="text-[#07b9d5] text-sm font-medium">{tag}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const tags = formData.tags.split(',').map(t => t.trim()).filter(t => t !== tag);
+                      handleChange('tags', tags.join(', '));
+                    }}
+                    className="text-[#07b9d5]/70 hover:text-[#07b9d5] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               ))}
+            {/* Input */}
+            <input
+              type="text"
+              value={formData.tags}
+              onChange={(e) => handleChange('tags', e.target.value)}
+              placeholder="Add tag..."
+              className="bg-transparent border-none focus:ring-0 text-white placeholder:text-white/40 min-w-[80px] flex-1 text-base h-8 p-0"
+            />
           </div>
-        )}
-      </div>
-
-      {/* Submit Buttons */}
-      <div className="flex items-center gap-3 pt-4">
-        <Button
-          type="submit"
-          variant="primary"
-          size="md"
-          isLoading={isSubmitting}
-          disabled={isSubmitting}
-        >
-          {mode === 'create' ? 'Create Solution' : 'Update Solution'}
-        </Button>
-        
-        <Button
-          type="button"
-          variant="outline"
-          size="md"
-          onClick={() => router.back()}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
+          {errors.tags && (
+            <p className="text-sm text-red-400">{errors.tags}</p>
+          )}
+          <p className="text-xs text-white/40">Separate tags with commas</p>
+        </div>
       </div>
     </form>
   );

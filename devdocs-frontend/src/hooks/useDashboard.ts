@@ -60,10 +60,7 @@ export const dashboardKeys = {
 export function useDashboardStats(): UseQueryResult<DashboardStats, Error> {
   return useQuery({
     queryKey: dashboardKeys.stats(),
-    queryFn: async () => {
-      const response = await dashboardApi.getStats();
-      return response.data;
-    },
+    queryFn: () => dashboardApi.getStats(),
     // Stats are fresh for 30 seconds (balance between freshness and performance)
     staleTime: 30 * 1000,
     // Keep stats cached for 5 minutes
@@ -124,10 +121,7 @@ export function useRecentSolutions({
 }: UseRecentSolutionsOptions = {}): UseQueryResult<Solution[], Error> {
   return useQuery({
     queryKey: dashboardKeys.recent(limit),
-    queryFn: async () => {
-      const response = await dashboardApi.getRecent(limit);
-      return response.data;
-    },
+    queryFn: () => dashboardApi.getRecent(limit),
     enabled,
     // Recent solutions are fresh for 1 minute
     staleTime: 60 * 1000,
