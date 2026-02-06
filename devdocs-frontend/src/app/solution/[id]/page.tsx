@@ -27,6 +27,7 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
   const { data: solution, isLoading, error } = useSolution(id);
   const deleteMutation = useDeleteSolution();
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   if (authLoading) {
     return (
@@ -54,13 +55,32 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
 
   async function handleCopyCode() {
     if (solution) {
-      await navigator.clipboard.writeText(solution.code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(solution.code);
+        } else {
+          // Fallback for HTTP or older browsers
+          const textarea = document.createElement('textarea');
+          textarea.value = solution.code;
+          textarea.style.position = 'fixed';
+          textarea.style.left = '-9999px';
+          textarea.style.top = '-9999px';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+        }
+        
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy code:', err);
+      }
     }
   }
 
   async function handleShare() {
+    // Try Web Share API first (works on mobile and some modern browsers)
     if (navigator.share) {
       try {
         await navigator.share({
@@ -68,13 +88,35 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
           text: solution?.description,
           url: window.location.href,
         });
+        return;
       } catch (err) {
-        // Silently fail if user cancels share
+        // User cancelled or share failed, fall through to clipboard
       }
-    } else {
-      // Fallback: copy URL to clipboard
-      await navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
+    }
+    
+    // Fallback: Copy URL to clipboard (works on HTTP too)
+    try {
+      const url = window.location.href;
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // Fallback for HTTP or older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        textarea.style.top = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
     }
   }
 
@@ -174,8 +216,17 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
               onClick={handleShare}
               className="flex items-center gap-2 h-10 px-5 rounded-lg bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-black text-sm font-bold shadow-lg shadow-[#07b9d5]/20 hover:shadow-[#07b9d5]/40 transition-all"
             >
-              <Share2 size={18} />
-              Share
+              {linkCopied ? (
+                <>
+                  <Check size={18} />
+                  Link Copied!
+                </>
+              ) : (
+                <>
+                  <Share2 size={18} />
+                  Share
+                </>
+              )}
             </button>
           </div>
         </div>

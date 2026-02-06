@@ -22,6 +22,7 @@ export const dashboardKeys = {
   all: ['dashboard'] as const,
   stats: () => [...dashboardKeys.all, 'stats'] as const,
   recent: (limit?: number) => [...dashboardKeys.all, 'recent', limit] as const,
+  weeklyActivity: () => [...dashboardKeys.all, 'weekly-activity'] as const,
 };
 
 // ============================================================================
@@ -137,6 +138,23 @@ export function useRecentSolutions({
 // ============================================================================
 
 /**
+ * Fetch weekly activity (solutions created per day for last 7 days)
+ */
+export function useWeeklyActivity(): UseQueryResult<number[], Error> {
+  return useQuery({
+    queryKey: dashboardKeys.weeklyActivity(),
+    queryFn: async () => {
+      const response = await dashboardApi.getWeeklyActivity();
+      return response.weekly_activity;
+    },
+    staleTime: 30 * 1000,
+    gcTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: true,
+    refetchInterval: 60 * 1000,
+  });
+}
+
+/**
  * Combined hook that fetches both stats and recent solutions
  * 
  * Convenience hook for dashboard page that needs both data sources
@@ -167,6 +185,7 @@ export function useRecentSolutions({
 export function useDashboard(recentLimit: number = 5) {
   const statsQuery = useDashboardStats();
   const recentQuery = useRecentSolutions({ limit: recentLimit });
+  const weeklyQuery = useWeeklyActivity();
 
   return {
     // Stats data
@@ -179,17 +198,24 @@ export function useDashboard(recentLimit: number = 5) {
     isRecentLoading: recentQuery.isLoading,
     recentError: recentQuery.error,
     
+    // Weekly activity data
+    weeklyActivity: weeklyQuery.data,
+    isWeeklyLoading: weeklyQuery.isLoading,
+    weeklyError: weeklyQuery.error,
+    
     // Combined loading/error states
-    isLoading: statsQuery.isLoading || recentQuery.isLoading,
-    isError: statsQuery.isError || recentQuery.isError,
-    error: statsQuery.error || recentQuery.error,
+    isLoading: statsQuery.isLoading || recentQuery.isLoading || weeklyQuery.isLoading,
+    isError: statsQuery.isError || recentQuery.isError || weeklyQuery.isError,
+    error: statsQuery.error || recentQuery.error || weeklyQuery.error,
     
     // Refetch functions
     refetchStats: statsQuery.refetch,
     refetchRecent: recentQuery.refetch,
+    refetchWeekly: weeklyQuery.refetch,
     refetchAll: () => {
       statsQuery.refetch();
       recentQuery.refetch();
+      weeklyQuery.refetch();
     },
   };
 }

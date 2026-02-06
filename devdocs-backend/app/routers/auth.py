@@ -7,12 +7,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import datetime
-from typing import Optional
 
 from app.database import get_db
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate, UserResponse, UserPublic
-from app.auth import get_current_user, get_current_user_optional, CurrentUser, get_auth_status
+from app.auth import get_current_user, CurrentUser, get_auth_status, get_or_create_user
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -41,23 +40,11 @@ async def get_current_user_profile(
     """
     Get current user's profile
     
-    Requires authentication
+    Auto-creates user on first login if doesn't exist (via get_or_create_user).
+    Requires authentication.
     """
-    result = await db.execute(
-        select(User).where(User.auth_id == current_user.id)
-    )
-    user = result.scalar_one_or_none()
-    
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User profile not found"
-        )
-    
-    # Update last login
-    user.last_login_at = datetime.now()
-    await db.commit()
-    
+    # Get or auto-create user
+    user = await get_or_create_user(current_user, db)
     return user
 
 @router.put("/me", response_model=UserResponse)
@@ -69,18 +56,11 @@ async def update_current_user_profile(
     """
     Update current user's profile
     
-    Requires authentication
+    Auto-creates user if doesn't exist (fallback).
+    Requires authentication.
     """
-    result = await db.execute(
-        select(User).where(User.auth_id == current_user.id)
-    )
-    user = result.scalar_one_or_none()
-    
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User profile not found"
-        )
+    # Get or auto-create user
+    user = await get_or_create_user(current_user, db)
     
     # Update fields
     update_data = user_update.model_dump(exclude_unset=True)

@@ -106,6 +106,9 @@ export interface Solution {
   
   /** Soft delete flag (not returned in normal queries) */
   is_archived?: boolean;
+  
+  /** Bookmark status for current user */
+  is_bookmarked?: boolean;
 }
 
 /**

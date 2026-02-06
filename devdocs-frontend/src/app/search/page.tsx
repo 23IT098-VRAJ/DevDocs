@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search as SearchIcon, Code2, Tag, Calendar, TrendingUp, Sparkles, Copy, Bookmark, ChevronRight, Home } from 'lucide-react';
+import { Search as SearchIcon, Code2, Tag, Calendar, TrendingUp, Sparkles, Copy, Bookmark, BookmarkCheck, ChevronRight, Home, Check } from 'lucide-react';
 import GlassmorphicNavbar from '@/components/layout/GlassmorphicNavbar';
 import { GlassmorphicFooter } from '@/components/layout/GlassmorphicFooter';
 import { useSearch } from '@/hooks/useSearch';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { bookmarksApi } from '@/lib/api';
 
 export default function SearchPage() {
   const { loading } = useRequireAuth();
@@ -14,7 +15,101 @@ export default function SearchPage() {
   const [language, setLanguage] = useState('');
   const [framework, setFramework] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [bookmarkedSolutions, setBookmarkedSolutions] = useState<Set<string>>(new Set());
+  const [bookmarkingId, setBookmarkingId] = useState<string | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  // Focus input on mount (client-side only)
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  // Use the search hook with debounced query
+  const { data: searchResults, isLoading: isSearching } = useSearch({
+    query: debouncedQuery,
+    limit: 20,
+  });
+
+  // Initialize bookmarked solutions from search results
+  useEffect(() => {
+    if (searchResults) {
+      const bookmarked = new Set<string>();
+      searchResults.forEach(result => {
+        if (result.solution.is_bookmarked) {
+          bookmarked.add(result.solution.id);
+        }
+      });
+      setBookmarkedSolutions(bookmarked);
+    }
+  }, [searchResults]);
+
+  // Copy to clipboard handler with fallback
+  const handleCopy = async (code: string, solutionId: string) => {
+    try {
+      // Try modern clipboard API first
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(code);
+        setCopiedId(solutionId);
+        setTimeout(() => setCopiedId(null), 2000);
+      } else {
+        // Fallback for browsers that don't support clipboard API
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (successful) {
+          setCopiedId(solutionId);
+          setTimeout(() => setCopiedId(null), 2000);
+        } else {
+          console.error('Copy command was unsuccessful');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  // Bookmark toggle handler
+  const handleBookmarkToggle = async (solutionId: string) => {
+    try {
+      setBookmarkingId(solutionId);
+      const response = await bookmarksApi.toggle(solutionId);
+      
+      setBookmarkedSolutions(prev => {
+        const newSet = new Set(prev);
+        if (response.bookmarked) {
+          newSet.add(solutionId);
+        } else {
+          newSet.delete(solutionId);
+        }
+        return newSet;
+      });
+    } catch (err) {
+      console.error('Failed to toggle bookmark:', err);
+    } finally {
+      setBookmarkingId(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -26,28 +121,6 @@ export default function SearchPage() {
       </div>
     );
   }
-
-  // Focus input on mount (client-side only)
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
-
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [query]);
-
-  // Use the search hook with debounced query
-  const { data: searchResults, isLoading: isSearching } = useSearch({
-    query: debouncedQuery,
-    limit: 20,
-  });
 
   const availableLanguages = ['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'Go', 'Rust', 'PHP'];
 
@@ -74,7 +147,7 @@ export default function SearchPage() {
       <GlassmorphicNavbar />
       <div className="pt-20 flex">
         {/* Left Sidebar: Filters */}
-        <aside className="w-80 border-r border-white/10 p-6 flex flex-col gap-6 shrink-0 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto hidden lg:block">
+        <aside className="w-80 border-r border-white/20 bg-black p-6 flex flex-col gap-6 shrink-0 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto hidden lg:block">
           <div>
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Sparkles size={20} className="text-[#07b9d5]" />
@@ -87,7 +160,7 @@ export default function SearchPage() {
               <select 
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="w-full rounded-lg text-white bg-black border border-white/10 h-12 px-4 text-sm focus:outline-none focus:border-[#07b9d5]/50 focus:ring-1 focus:ring-[#07b9d5]/50 transition-all [&>option]:bg-black [&>option]:text-white [&>option]:py-2"
+                className="w-full rounded-lg text-white bg-black border border-white/20 h-12 px-4 text-sm focus:outline-none focus:border-[#07b9d5]/50 focus:ring-1 focus:ring-[#07b9d5]/50 transition-all [&>option]:bg-black [&>option]:text-white [&>option]:py-2"
               >
                 <option value="" className="bg-black text-white">All Languages</option>
                 {availableLanguages.map(lang => (
@@ -104,7 +177,7 @@ export default function SearchPage() {
                 value={framework}
                 onChange={(e) => setFramework(e.target.value)}
                 placeholder="e.g. FastAPI, React"
-                className="w-full rounded-lg text-white bg-white/5 border border-white/10 h-12 px-4 text-sm focus:outline-none focus:border-[#07b9d5]/50 focus:ring-1 focus:ring-[#07b9d5]/50 transition-all placeholder:text-white/30"
+                className="w-full rounded-lg text-white bg-black border border-white/20 h-12 px-4 text-sm focus:outline-none focus:border-[#07b9d5]/50 focus:ring-1 focus:ring-[#07b9d5]/50 transition-all placeholder:text-white/30"
               />
             </div>
 
@@ -115,7 +188,7 @@ export default function SearchPage() {
                   setLanguage('');
                   setFramework('');
                 }}
-                className="w-full py-2 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white/70 text-sm font-medium transition-all"
+                className="w-full py-2 px-4 bg-black hover:bg-white/10 border border-white/20 rounded-lg text-white/70 text-sm font-medium transition-all"
               >
                 Clear All Filters
               </button>
@@ -150,7 +223,7 @@ export default function SearchPage() {
           <div className="w-full max-w-4xl mx-auto mb-10">
             <form onSubmit={handleSearch}>
               <div className="relative group">
-                <div className="flex items-center h-16 bg-white/5 backdrop-blur-xl border border-[#07b9d5]/20 rounded-2xl group-focus-within:border-[#07b9d5]/50 group-focus-within:shadow-lg group-focus-within:shadow-[#07b9d5]/20 transition-all duration-300">
+                <div className="flex items-center h-16 bg-black backdrop-blur-xl border border-[#07b9d5]/20 rounded-2xl group-focus-within:border-[#07b9d5]/50 group-focus-within:shadow-lg group-focus-within:shadow-[#07b9d5]/20 transition-all duration-300">
                   <div className="flex items-center justify-center pl-5 pr-3 text-[#07b9d5]">
                     <SearchIcon size={24} />
                   </div>
@@ -181,7 +254,7 @@ export default function SearchPage() {
                 <button
                   key={tag}
                   onClick={() => setQuery(tag)}
-                  className="px-3 py-1 rounded-full bg-white/5 text-[#07b9d5] hover:bg-white/10 transition text-xs border border-white/10 hover:border-[#07b9d5]/30"
+                  className="px-3 py-1 rounded-full bg-black text-[#07b9d5] hover:bg-white/10 transition text-xs border border-white/20 hover:border-[#07b9d5]/30"
                 >
                   #{tag}
                 </button>
@@ -192,7 +265,7 @@ export default function SearchPage() {
           {/* Results Section */}
           <div className="w-full max-w-4xl mx-auto">
             {debouncedQuery && (
-              <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+              <div className="flex items-center justify-between pb-4 border-b border-white/20 mb-6">
                 <h3 className="text-white font-bold text-lg">Top Results</h3>
                 <span className="text-white/40 text-sm">
                   {isSearching ? 'Searching...' : `Found ${filteredResults.length} matches`}
@@ -204,7 +277,7 @@ export default function SearchPage() {
             {isSearching && (
               <div className="grid grid-cols-1 gap-6">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl p-6 animate-pulse">
+                  <div key={i} className="backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-6 animate-pulse">
                     <div className="h-6 bg-white/10 rounded w-3/4 mb-4"></div>
                     <div className="h-4 bg-white/10 rounded w-1/2 mb-4"></div>
                     <div className="h-32 bg-white/10 rounded mb-4"></div>
@@ -232,7 +305,7 @@ export default function SearchPage() {
                     <button
                       key={example}
                       onClick={() => setQuery(example)}
-                      className="px-4 py-2 bg-white/5 text-white/70 hover:text-white hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium transition-all duration-300"
+                      className="px-4 py-2 bg-black text-white/70 hover:text-white hover:bg-white/10 border border-white/20 rounded-lg text-sm font-medium transition-all duration-300"
                     >
                       {example}
                     </button>
@@ -244,7 +317,7 @@ export default function SearchPage() {
             {/* Empty State - No Results */}
             {debouncedQuery && !isSearching && filteredResults.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-20 h-20 bg-gradient-to-br from-white/5 to-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/10">
+                <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center mb-6 border border-white/20">
                   <SearchIcon size={40} className="text-white/40" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-3">No Results Found</h3>
@@ -260,7 +333,7 @@ export default function SearchPage() {
                 {filteredResults.map((result) => (
                   <article
                     key={result.solution.id}
-                    className="group relative backdrop-blur-2xl bg-white/5 border border-[#07b9d5]/20 rounded-2xl p-6 hover:border-[#07b9d5]/40 hover:shadow-xl hover:shadow-[#07b9d5]/10 transition-all duration-300 cursor-pointer"
+                    className="group relative backdrop-blur-2xl bg-black border border-[#07b9d5]/20 rounded-2xl p-6 hover:border-[#07b9d5]/40 hover:shadow-xl hover:shadow-[#07b9d5]/10 transition-all duration-300 cursor-pointer"
                   >
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
@@ -286,7 +359,7 @@ export default function SearchPage() {
 
                     {/* Code Preview */}
                     {result.solution.code && (
-                      <div className="relative mb-4 bg-black/60 border border-white/10 rounded-xl p-4 overflow-hidden">
+                      <div className="relative mb-4 bg-black border border-white/20 rounded-xl p-4 overflow-hidden">
                         {/* Window Dots */}
                         <div className="absolute top-3 right-3 flex gap-1.5">
                           <div className="size-2.5 rounded-full bg-red-500/20"></div>
@@ -305,7 +378,7 @@ export default function SearchPage() {
                     {/* Footer */}
                     <div className="flex items-center gap-4 mt-4">
                       {/* Language Badge */}
-                      <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg">
+                      <div className="flex items-center gap-1.5 bg-black border border-white/20 px-3 py-1.5 rounded-lg">
                         <Code2 size={14} className="text-[#07b9d5]" />
                         <span className="text-white/70 text-xs font-medium">{result.solution.language}</span>
                       </div>
@@ -323,16 +396,41 @@ export default function SearchPage() {
 
                       {/* Action Buttons */}
                       <button 
-                        className="p-2 text-white/40 hover:text-white transition-colors rounded-full hover:bg-white/5"
-                        title="Save to bookmarks"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          handleBookmarkToggle(result.solution.id);
+                        }}
+                        disabled={bookmarkingId === result.solution.id}
+                        className={`p-2 transition-colors rounded-full hover:bg-white/5 ${
+                          bookmarkedSolutions.has(result.solution.id)
+                            ? 'text-[#07b9d5]'
+                            : 'text-white/40 hover:text-white'
+                        }`}
+                        title={bookmarkedSolutions.has(result.solution.id) ? "Remove bookmark" : "Save to bookmarks"}
                       >
-                        <Bookmark size={18} />
+                        {bookmarkedSolutions.has(result.solution.id) ? (
+                          <BookmarkCheck size={18} className="fill-current" />
+                        ) : (
+                          <Bookmark size={18} />
+                        )}
                       </button>
                       <button 
-                        className="p-2 text-white/40 hover:text-white transition-colors rounded-full hover:bg-white/5"
-                        title="Copy code"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          handleCopy(result.solution.code, result.solution.id);
+                        }}
+                        className={`p-2 transition-colors rounded-full hover:bg-white/5 ${
+                          copiedId === result.solution.id
+                            ? 'text-green-400'
+                            : 'text-white/40 hover:text-white'
+                        }`}
+                        title={copiedId === result.solution.id ? "Copied!" : "Copy code"}
                       >
-                        <Copy size={18} />
+                        {copiedId === result.solution.id ? (
+                          <Check size={18} />
+                        ) : (
+                          <Copy size={18} />
+                        )}
                       </button>
 
                       {/* Date */}
@@ -347,7 +445,7 @@ export default function SearchPage() {
                 {/* Load More Button */}
                 {filteredResults.length >= 10 && (
                   <div className="mt-6 flex justify-center">
-                    <button className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white text-sm font-bold rounded-lg transition-all flex items-center gap-2 border border-white/10 hover:border-[#07b9d5]/30">
+                    <button className="px-6 py-3 bg-black hover:bg-white/10 text-white text-sm font-bold rounded-lg transition-all flex items-center gap-2 border border-white/20 hover:border-[#07b9d5]/30">
                       Load More Solutions
                       <ChevronRight size={18} className="rotate-90" />
                     </button>

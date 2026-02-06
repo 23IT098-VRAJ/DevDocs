@@ -50,20 +50,27 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     // Get current session from Supabase
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session }, error } = await supabase.auth.getSession();
     
-    // Attach Bearer token if session exists
+    // Log session status in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+      if (!session) {
+        console.warn('[Auth] No active session found');
+      }
+    }
+    
+    // Attach Bearer token if session exists and is valid
     if (session?.access_token) {
       config.headers.Authorization = `Bearer ${session.access_token}`;
+    } else if (config.url?.includes('/dashboard') || config.url?.includes('/solutions')) {
+      // Prevent requests to protected endpoints without authentication
+      console.error('[Auth] Attempted to access protected endpoint without valid session');
+      return Promise.reject(new Error('Authentication required'));
     }
     
     // Add timestamp for latency tracking
     config.headers['X-Request-Time'] = new Date().toISOString();
-    
-    // Log request in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
-    }
     
     return config;
   },
@@ -151,13 +158,29 @@ apiClient.interceptors.response.use(
       errorMessage = error.message || 'Request failed';
     }
     
-    // Log error in development (only log server errors, not network/connection errors)
-    if (process.env.NODE_ENV === 'development' && error.response) {
-      console.error('[API Error]', {
-        message: errorMessage,
-        status: error.response.status,
-        url: error.config?.url,
-      });
+    // Log error in development
+    if (process.env.NODE_ENV === 'development') {
+      if (error.response) {
+        // Server error
+        console.error('[API Error]', {
+          message: errorMessage,
+          status: error.response.status,
+          url: error.config?.url,
+          data: error.response.data,
+        });
+      } else if (error.request) {
+        // Network error
+        console.error('[API Network Error]', {
+          message: errorMessage,
+          url: error.config?.url,
+        });
+      } else {
+        // Setup error
+        console.error('[API Request Error]', {
+          message: errorMessage,
+          error: error.message,
+        });
+      }
     }
     
     // Throw formatted error
@@ -180,8 +203,10 @@ export const solutionsApi = {
    * @returns Paginated list of solutions
    */
   async getAll(params?: { page?: number; limit?: number; language?: string }): Promise<Solution[]> {
-    const response = await apiClient.get<Solution[]>('/api/solutions', { params });
-    return response.data;
+    const response = await apiClient.get<any>('/api/solutions', { params });
+    // Backend returns { solutions: [...], total, page, page_size, total_pages }
+    // Extract just the solutions array
+    return response.data.solutions || [];
   },
 
   /**
@@ -241,7 +266,67 @@ export const searchApi = {
    * @returns Ranked search results with similarity scores
    */
   async search(params: SearchParams): Promise<SearchResult[]> {
-    const response = await apiClient.get<SearchResult[]>('/api/search', { params });
+    const response = await apiClient.post<any>('/api/search', {
+      query: params.q, // Frontend uses 'q', backend expects 'query'
+      limit: params.limit || 10,
+      min_similarity: 0.3
+    });
+    // Backend returns { results: [...], query: "...", count: X, search_time_ms: X }
+    return response.data.results || [];
+  },
+};
+
+// ============================================================================
+// BOOKMARKS API
+// ============================================================================
+
+/**
+ * Bookmarks API endpoints
+ * Handles bookmark management for solutions
+ */
+export const bookmarksApi = {
+  /**
+   * Toggle bookmark for a solution (add if not exists, remove if exists)
+   * @param solutionId - Solution UUID
+   * @returns Bookmark toggle response with status
+   */
+  async toggle(solutionId: string): Promise<{ bookmarked: boolean; message: string }> {
+    const response = await apiClient.post<{ bookmarked: boolean; message: string }>(
+      `/api/bookmarks/toggle/${solutionId}`
+    );
+    return response.data;
+  },
+
+  /**
+   * Get all bookmarks for current user
+   * @returns Array of bookmarks with solution details
+   */
+  async getAll(): Promise<any[]> {
+    const response = await apiClient.get<any[]>('/api/bookmarks');
+    return response.data;
+  },
+
+  /**
+   * Check if a solution is bookmarked
+   * @param solutionId - Solution UUID
+   * @returns Bookmark status
+   */
+  async check(solutionId: string): Promise<{ bookmarked: boolean }> {
+    const response = await apiClient.get<{ bookmarked: boolean }>(
+      `/api/bookmarks/check/${solutionId}`
+    );
+    return response.data;
+  },
+
+  /**
+   * Remove a bookmark
+   * @param solutionId - Solution UUID
+   * @returns Success message
+   */
+  async remove(solutionId: string): Promise<{ message: string }> {
+    const response = await apiClient.delete<{ message: string }>(
+      `/api/bookmarks/${solutionId}`
+    );
     return response.data;
   },
 };
@@ -270,9 +355,20 @@ export const dashboardApi = {
    * @returns Array of recent solutions
    */
   async getRecent(limit: number = 5): Promise<Solution[]> {
-    const response = await apiClient.get<Solution[]>('/api/dashboard/recent', {
+    const response = await apiClient.get<any>('/api/dashboard/recent', {
       params: { limit },
     });
+    // Backend returns { recent_solutions: [...] }
+    // Extract just the solutions array
+    return response.data.recent_solutions || [];
+  },
+
+  /**
+   * Get weekly activity (solutions created per day for last 7 days)
+   * @returns Object with weekly_activity array
+   */
+  async getWeeklyActivity(): Promise<{ weekly_activity: number[] }> {
+    const response = await apiClient.get<{ weekly_activity: number[] }>('/api/dashboard/weekly-activity');
     return response.data;
   },
 };

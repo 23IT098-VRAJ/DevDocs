@@ -9,11 +9,16 @@ import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout';
 export default function AuthenticatedHome() {
   const { user } = useAuth();
   const router = useRouter();
-  const { stats, recentSolutions, isLoading } = useDashboard(5);
+  const { stats, recentSolutions, weeklyActivity, isLoading } = useDashboard(3);
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('Dashboard data:', { stats, recentSolutions, weeklyActivity, isLoading });
+  }, [stats, recentSolutions, weeklyActivity, isLoading]);
 
   // Calculate language distribution from recent solutions
   const languageDistribution = React.useMemo(() => {
-    if (!recentSolutions) return [];
+    if (!recentSolutions || !Array.isArray(recentSolutions)) return [];
     
     const langCounts: Record<string, number> = {};
     recentSolutions.forEach((solution) => {
@@ -31,7 +36,7 @@ export default function AuthenticatedHome() {
         {/* Welcome Section */}
         <div className="mb-8 relative">
           <div className="absolute inset-0 bg-gradient-to-r from-[#07b9d5]/20 via-transparent to-transparent blur-3xl"></div>
-          <div className="relative backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl p-8">
+          <div className="relative backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-8">
             <h1 className="text-4xl font-bold mb-2">
               Welcome back, <span className="text-[#07b9d5]">{user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Developer'}</span>
             </h1>
@@ -40,41 +45,194 @@ export default function AuthenticatedHome() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard
-            icon="code"
-            label="Total Solutions"
-            value={isLoading ? '...' : stats?.total_solutions?.toString() || '0'}
-            trend="+12% from last month"
-            trendUp={true}
-          />
-          <StatCard
-            icon="language"
-            label="Languages"
-            value={isLoading ? '...' : stats?.total_languages?.toString() || '0'}
-            trend="5 active"
-            trendUp={true}
-          />
-          <StatCard
-            icon="search"
-            label="Total Searches"
-            value={isLoading ? '...' : stats?.total_searches?.toString() || '0'}
-            trend="+8% this week"
-            trendUp={true}
-          />
-          <StatCard
-            icon="analytics"
-            label="Avg. Similarity"
-            value={isLoading ? '...' : stats?.average_similarity ? `${Math.round(stats.average_similarity * 100)}%` : '0%'}
-            trend="High accuracy"
-            trendUp={true}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Total Solutions Card - Enhanced with Graph */}
+          <div className="relative backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-6 overflow-hidden group hover:border-[#07b9d5]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#07b9d5]/20 min-h-[320px]">
+            {/* Animated Background Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#07b9d5]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#07b9d5]/5 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-3xl"></div>
+            
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#07b9d5] to-[#059ab3] rounded-xl flex items-center justify-center shadow-lg shadow-[#07b9d5]/30 group-hover:shadow-[#07b9d5]/50 group-hover:scale-110 transition-all duration-300">
+                    <span className="material-symbols-outlined text-white text-3xl">terminal</span>
+                  </div>
+                  <div>
+                    <p className="text-slate-400 text-xs uppercase tracking-wider font-medium">Total Solutions</p>
+                    <p className="text-5xl font-bold text-white mt-1 tabular-nums">
+                      {isLoading ? '...' : stats?.total_solutions?.toString() || '0'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Enhanced Weekly Activity Chart */}
+              <div className="flex-1 flex flex-col justify-end mt-6">
+                <p className="text-xs text-slate-400 mb-3 font-medium uppercase tracking-wider">Last 7 Days Activity</p>
+                <div className="flex items-end gap-2 h-32">
+                  {(weeklyActivity || [0, 0, 0, 0, 0, 0, 0]).map((count, i) => {
+                    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    const maxCount = Math.max(...(weeklyActivity || [1]), 1);
+                    const heightPercent = maxCount > 0 ? Math.max((count / maxCount) * 100, 8) : 8;
+                    
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                        <div 
+                          className="w-full bg-gradient-to-t from-[#07b9d5] to-cyan-400 rounded-t-lg relative group/bar transition-all duration-500 hover:from-[#07b9d5] hover:to-[#3ae0ff] cursor-pointer"
+                          style={{
+                            height: `${heightPercent}%`,
+                            transitionDelay: `${i * 50}ms`,
+                            boxShadow: count > 0 ? '0 0 20px rgba(7, 185, 213, 0.3)' : 'none',
+                          }}
+                        >
+                          {/* Count Label */}
+                          {count > 0 && (
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-[#07b9d5] opacity-0 group-hover/bar:opacity-100 transition-opacity">
+                              {count}
+                            </div>
+                          )}
+                          
+                          {/* Tooltip */}
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl z-10">
+                            {count} solution{count !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-slate-500 font-medium">{days[i]}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Language Distribution Card - Enhanced with Pie Chart */}
+          <div className="relative backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-6 overflow-hidden group hover:border-[#07b9d5]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#07b9d5]/20 min-h-[320px]">
+            {/* Animated Background Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#07b9d5]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            {/* Decorative Elements */}
+            <div className="absolute top-0 left-0 w-32 h-32 bg-[#07b9d5]/5 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-3xl"></div>
+            
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#07b9d5] to-[#059ab3] rounded-xl flex items-center justify-center shadow-lg shadow-[#07b9d5]/30 group-hover:shadow-[#07b9d5]/50 group-hover:scale-110 transition-all duration-300">
+                    <span className="material-symbols-outlined text-white text-3xl">translate</span>
+                  </div>
+                  <div>
+                    <p className="text-slate-400 text-xs uppercase tracking-wider font-medium">Languages Used</p>
+                    <p className="text-5xl font-bold text-white mt-1 tabular-nums">{stats?.total_languages || 0}</p>
+                  </div>
+                </div>
+                <span className="text-xs px-3 py-1.5 bg-cyan-500/20 text-cyan-400 rounded-full border border-cyan-500/30 font-medium">
+                  {stats?.total_languages || 0} active
+                </span>
+              </div>
+              
+              {isLoading ? (
+                <div className="flex items-center justify-center h-32">
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#07b9d5]"></div>
+                </div>
+              ) : stats?.language_breakdown && stats.language_breakdown.length > 0 ? (
+                <div className="flex flex-col lg:flex-row gap-4 mt-4">
+                  {/* Pie Chart */}
+                  <div className="flex-shrink-0 flex items-center justify-center lg:items-start">
+                    <svg width="180" height="180" viewBox="0 0 200 200" className="transform -rotate-90">
+                      {(() => {
+                        const total = stats.total_solutions || 1;
+                        let currentAngle = 0;
+                        const colors = [
+                          '#07b9d5', '#06a5bf', '#0e7490', '#0c6682', 
+                          '#14b8a6', '#0891b2', '#0284c7', '#2563eb',
+                          '#7c3aed', '#c026d3', '#db2777', '#dc2626'
+                        ];
+                        
+                        return stats.language_breakdown.map((lang: any, index: number) => {
+                          const percentage = (lang.count / total) * 100;
+                          const angle = (percentage / 100) * 360;
+                          const startAngle = currentAngle;
+                          currentAngle += angle;
+                          
+                          // Convert to radians
+                          const startRad = (startAngle * Math.PI) / 180;
+                          const endRad = (currentAngle * Math.PI) / 180;
+                          
+                          // Calculate arc path
+                          const x1 = 100 + 80 * Math.cos(startRad);
+                          const y1 = 100 + 80 * Math.sin(startRad);
+                          const x2 = 100 + 80 * Math.cos(endRad);
+                          const y2 = 100 + 80 * Math.sin(endRad);
+                          
+                          const largeArc = angle > 180 ? 1 : 0;
+                          const pathData = [
+                            `M 100 100`,
+                            `L ${x1} ${y1}`,
+                            `A 80 80 0 ${largeArc} 1 ${x2} ${y2}`,
+                            `Z`
+                          ].join(' ');
+                          
+                          return (
+                            <path
+                              key={lang.language}
+                              d={pathData}
+                              fill={colors[index % colors.length]}
+                              className="hover:opacity-80 transition-opacity cursor-pointer"
+                              style={{ filter: 'drop-shadow(0 0 8px rgba(7, 185, 213, 0.3))' }}
+                            >
+                              <title>{`${lang.language}: ${percentage.toFixed(1)}%`}</title>
+                            </path>
+                          );
+                        });
+                      })()}
+                    </svg>
+                  </div>
+                  
+                  {/* Legend */}
+                  <div className="flex-1 space-y-1.5 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar">
+                    {stats.language_breakdown.map((lang: any, index: number) => {
+                      const colors = [
+                        '#07b9d5', '#06a5bf', '#0e7490', '#0c6682', 
+                        '#14b8a6', '#0891b2', '#0284c7', '#2563eb',
+                        '#7c3aed', '#c026d3', '#db2777', '#dc2626'
+                      ];
+                      const percentage = ((lang.count / (stats.total_solutions || 1)) * 100).toFixed(1);
+                      
+                      return (
+                        <div key={lang.language} className="flex items-center justify-between gap-2 group/lang hover:bg-slate-800/30 rounded px-2 py-1 transition-colors">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <div 
+                              className="w-2.5 h-2.5 rounded-sm flex-shrink-0" 
+                              style={{ 
+                                backgroundColor: colors[index % colors.length],
+                                boxShadow: `0 0 6px ${colors[index % colors.length]}40`
+                              }}
+                            ></div>
+                            <span className="text-xs text-slate-300 font-medium truncate">{lang.language}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <span className="text-[10px] text-slate-500 tabular-nums">{lang.count}</span>
+                            <span className="text-xs font-bold text-[#07b9d5] tabular-nums min-w-[2.5rem] text-right">{percentage}%</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-slate-500 text-sm">No data available</p>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Two Column Layout for Recent Solutions and Language Distribution */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Solutions - Takes 2 columns */}
-          <div className="lg:col-span-2 backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl p-6">
+        {/* Recent Solutions - Full Width */}
+        <div className="backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold">Recent Solutions</h2>
               <button 
@@ -88,7 +246,7 @@ export default function AuthenticatedHome() {
             {isLoading ? (
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-black/50 border border-slate-700 rounded-xl p-4 animate-pulse">
+                  <div key={i} className="bg-black border border-white/20 rounded-xl p-4 animate-pulse">
                     <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-slate-700 rounded w-1/2"></div>
                   </div>
@@ -109,11 +267,11 @@ export default function AuthenticatedHome() {
               </div>
             ) : (
               <div className="space-y-3">
-                {recentSolutions?.map((solution) => (
+                {Array.isArray(recentSolutions) && recentSolutions.map((solution) => (
                   <button
                     key={solution.id}
                     onClick={() => router.push(`/solution/${solution.id}`)}
-                    className="w-full bg-black/50 border border-slate-700 rounded-xl p-4 hover:border-[#07b9d5] transition-colors text-left group"
+                    className="w-full bg-black border border-white/20 rounded-xl p-4 hover:border-[#07b9d5] transition-colors text-left group"
                   >
                     <div className="flex items-start gap-3">
                       <div className="w-10 h-10 bg-gradient-to-br from-[#07b9d5] to-[#059ab3] rounded-lg flex items-center justify-center flex-shrink-0">
@@ -129,7 +287,7 @@ export default function AuthenticatedHome() {
                           {solution.description}
                         </p>
                         <div className="flex items-center gap-3 mt-2">
-                          <span className="text-xs px-2 py-1 bg-slate-800 text-slate-300 rounded-md">
+                          <span className="text-xs px-2 py-1 bg-black border border-white/20 text-slate-300 rounded-md">
                             {solution.language}
                           </span>
                           <span className="text-xs text-slate-500">
@@ -143,69 +301,7 @@ export default function AuthenticatedHome() {
               </div>
             )}
           </div>
-
-          {/* Language Distribution - Takes 1 column */}
-          <div className="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl p-6">
-            <h2 className="text-xl font-semibold mb-6">Language Distribution</h2>
-            {isLoading ? (
-              <div className="flex items-center justify-center h-48">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#07b9d5]"></div>
-              </div>
-            ) : languageDistribution.length > 0 ? (
-              <div className="space-y-4">
-                {languageDistribution.map((lang) => (
-                  <div key={lang.language}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-slate-300">{lang.language}</span>
-                      <span className="text-sm font-medium text-[#07b9d5]">{lang.count}</span>
-                    </div>
-                    <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-[#07b9d5] to-[#059ab3] transition-all duration-500"
-                        style={{
-                          width: `${(lang.count / (recentSolutions?.length || 1)) * 100}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <span className="material-symbols-outlined text-slate-600 text-4xl mb-3">
-                  pie_chart
-                </span>
-                <p className="text-slate-400 text-sm">No data available</p>
-              </div>
-            )}
-          </div>
         </div>
-      </div>
     </AuthenticatedLayout>
-  );
-}
-
-interface StatCardProps {
-  icon: string;
-  label: string;
-  value: string;
-  trend: string;
-  trendUp: boolean;
-}
-
-function StatCard({ icon, label, value, trend, trendUp }: StatCardProps) {
-  return (
-    <div className="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-[#07b9d5] transition-colors">
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-12 h-12 bg-gradient-to-br from-[#07b9d5] to-[#059ab3] rounded-xl flex items-center justify-center">
-          <span className="material-symbols-outlined text-white text-2xl">{icon}</span>
-        </div>
-        <span className={`text-xs px-2 py-1 rounded-md ${trendUp ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-          {trend}
-        </span>
-      </div>
-      <div className="text-3xl font-bold text-white mb-1">{value}</div>
-      <div className="text-sm text-slate-400">{label}</div>
-    </div>
   );
 }

@@ -18,7 +18,22 @@ export function CopyButton({ text, className = '' }: CopyButtonProps) {
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(text);
+      // Check if Clipboard API is available (requires HTTPS or localhost)
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for HTTP or older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        textarea.style.top = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Grid3x3, Plus, User, LogOut, Home, Menu, X } from 'lucide-react';
+import { Search, Grid3x3, Plus, User, LogOut, Home, Menu, X, Bookmark } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -80,7 +80,7 @@ export default function GlassmorphicNavbar() {
               {/* ─── LEFT: Logo (flex-shrink-0 so it never compresses) ─── */}
               <button
                 onClick={() => navigateTo('/')}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-[#07b9d5] focus:ring-offset-2 focus:ring-offset-black rounded-lg"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity flex-shrink-0 focus:outline-none cursor-pointer rounded-lg"
                 aria-label="DevDocs home"
               >
                 <div className="relative group">
@@ -162,9 +162,15 @@ export default function GlassmorphicNavbar() {
                 onClick={() => navigateTo('/solution')}
               />
               <GlassMobileNavLink
+                icon={<Bookmark size={18} />}
+                label="Bookmarks"
+                active={pathname === '/bookmarks'}
+                onClick={() => navigateTo('/bookmarks')}
+              />
+              <GlassMobileNavLink
                 icon={<Plus size={18} />}
                 label="New Solution"
-                primary
+                active={pathname === '/solution/create'}
                 onClick={() => navigateTo('/solution/create')}
               />
               <GlassMobileNavLink
@@ -199,10 +205,8 @@ function GlassMobileNavLink({ icon, label, active, badge, primary, onClick }: Gl
       aria-current={active ? 'page' : undefined}
       aria-label={label}
       className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 mt-1.5 focus:outline-none focus:ring-2 focus:ring-[#07b9d5] focus:ring-offset-2 focus:ring-offset-black/90 ${
-        primary
-          ? 'bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-black shadow-lg shadow-[#07b9d5]/30'
-          : active
-          ? 'bg-gradient-to-r from-[#07b9d5]/20 to-[#059ab3]/10 text-[#07b9d5] border border-[#07b9d5]/30'
+        active
+          ? 'bg-black text-[#07b9d5] border border-[#07b9d5]/30'
           : 'text-white/70 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10'
       }`}
     >

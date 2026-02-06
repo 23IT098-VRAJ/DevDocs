@@ -20,6 +20,19 @@ export default function SolutionsPage() {
   const { loading: authLoading } = useRequireAuth();
   const { data: solutions, isLoading, error } = useSolutions();
 
+  // All useState hooks must be called before any conditional returns
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('Browse Solutions data:', { solutions, isLoading, error });
+  }, [solutions, isLoading, error]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -30,17 +43,10 @@ export default function SolutionsPage() {
       </div>
     );
   }
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Calculate language counts
   const languageCounts = useMemo(() => {
-    if (!solutions) return {};
+    if (!solutions || !Array.isArray(solutions)) return {};
     const counts: Record<string, number> = {};
     solutions.forEach(sol => {
       counts[sol.language] = (counts[sol.language] || 0) + 1;
@@ -50,7 +56,7 @@ export default function SolutionsPage() {
 
   // Get popular tags
   const popularTags = useMemo(() => {
-    if (!solutions) return [];
+    if (!solutions || !Array.isArray(solutions)) return [];
     const tagCounts: Record<string, number> = {};
     solutions.forEach(sol => {
       if (sol.tags) {
@@ -67,7 +73,7 @@ export default function SolutionsPage() {
 
   // Filter and sort solutions
   const filteredSolutions = useMemo(() => {
-    if (!solutions) return [];
+    if (!solutions || !Array.isArray(solutions)) return [];
     
     let filtered = [...solutions];
 
@@ -181,9 +187,9 @@ export default function SolutionsPage() {
   return (
     <div className="min-h-screen bg-black">
       <GlassmorphicNavbar />
-      <div className="pt-20 flex">
+      <div className="pt-20 flex min-h-screen">
         {/* Left Sidebar: Filters */}
-        <aside className="w-80 border-r border-white/10 flex-shrink-0 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto hidden lg:block">
+        <aside className="w-80 border-r border-white/20 flex-shrink-0 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto hidden lg:block bg-black">
           <div className="p-6 flex flex-col gap-6">
             {/* Filters Header */}
             <div className="flex flex-col gap-4">
@@ -199,7 +205,7 @@ export default function SolutionsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search within results..."
-                  className="w-full rounded-lg text-white bg-white/5 border border-white/10 h-10 px-4 pl-10 text-sm focus:outline-none focus:border-[#07b9d5]/50 focus:ring-1 focus:ring-[#07b9d5]/50 transition-all placeholder:text-white/40"
+                  className="w-full rounded-lg text-white bg-black border border-white/20 h-10 px-4 pl-10 text-sm focus:outline-none focus:border-[#07b9d5]/50 focus:ring-1 focus:ring-[#07b9d5]/50 transition-all placeholder:text-white/40"
                 />
                 <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
               </div>
@@ -211,7 +217,7 @@ export default function SolutionsPage() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="w-full appearance-none rounded-lg text-white bg-black border border-white/10 h-10 px-4 pr-10 text-sm focus:outline-none focus:border-[#07b9d5]/50 focus:ring-1 focus:ring-[#07b9d5]/50 transition-all [&>option]:bg-black [&>option]:text-white"
+                    className="w-full appearance-none rounded-lg text-white bg-black border border-white/20 h-10 px-4 pr-10 text-sm focus:outline-none focus:border-[#07b9d5]/50 focus:ring-1 focus:ring-[#07b9d5]/50 transition-all [&>option]:bg-black [&>option]:text-white"
                   >
                     <option value="newest" className="bg-black text-white">Newest First</option>
                     <option value="oldest" className="bg-black text-white">Oldest First</option>
@@ -235,7 +241,7 @@ export default function SolutionsPage() {
                       className="w-4 h-4 rounded border-white/20 bg-black text-[#07b9d5] focus:ring-offset-0 focus:ring-1 focus:ring-[#07b9d5] checked:bg-[#07b9d5] checked:border-[#07b9d5] transition-all"
                     />
                     <span className="text-white/70 group-hover:text-white text-sm transition-colors capitalize">{lang}</span>
-                    <span className="ml-auto text-xs text-white/40 bg-white/5 px-2 py-0.5 rounded">{count}</span>
+                    <span className="ml-auto text-xs text-white/40 bg-black border border-white/20 px-2 py-0.5 rounded">{count}</span>
                   </label>
                 ))}
               </div>
@@ -253,7 +259,7 @@ export default function SolutionsPage() {
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                         selectedTags.includes(tag)
                           ? 'bg-[#07b9d5]/20 border border-[#07b9d5] text-[#07b9d5]'
-                          : 'bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-[#07b9d5]/40 hover:bg-white/10'
+                          : 'bg-black border border-white/20 text-white/60 hover:text-white hover:border-[#07b9d5]/40'
                       }`}
                     >
                       {tag}
@@ -288,7 +294,7 @@ export default function SolutionsPage() {
             <div className="flex flex-wrap gap-2 mb-6 items-center">
               <span className="text-white/60 text-sm mr-2">Active:</span>
               {selectedLanguages.map(lang => (
-                <div key={lang} className="flex items-center gap-2 bg-white/5 text-[#07b9d5] px-3 py-1.5 rounded-full border border-[#07b9d5]/30 text-sm">
+                <div key={lang} className="flex items-center gap-2 bg-black text-[#07b9d5] px-3 py-1.5 rounded-full border border-[#07b9d5]/50 text-sm">
                   <span className="capitalize">{lang}</span>
                   <button onClick={() => toggleLanguage(lang)} className="hover:text-white">
                     <X size={14} />
@@ -296,7 +302,7 @@ export default function SolutionsPage() {
                 </div>
               ))}
               {selectedTags.map(tag => (
-                <div key={tag} className="flex items-center gap-2 bg-white/5 text-[#07b9d5] px-3 py-1.5 rounded-full border border-[#07b9d5]/30 text-sm">
+                <div key={tag} className="flex items-center gap-2 bg-black text-[#07b9d5] px-3 py-1.5 rounded-full border border-[#07b9d5]/50 text-sm">
                   {tag}
                   <button onClick={() => toggleTag(tag)} className="hover:text-white">
                     <X size={14} />
@@ -318,8 +324,8 @@ export default function SolutionsPage() {
 
           {/* Error State */}
           {error && (
-            <div className="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl p-12 text-center">
-              <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-12 text-center">
+              <div className="w-16 h-16 bg-black border border-red-500/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <X size={32} className="text-red-400" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Failed to Load Solutions</h2>
@@ -335,8 +341,8 @@ export default function SolutionsPage() {
 
           {/* Empty State */}
           {!isLoading && !error && filteredSolutions.length === 0 && (
-            <div className="backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl p-16 text-center">
-              <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-16 text-center">
+              <div className="w-20 h-20 bg-black border border-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Code2 size={40} className="text-white/40" />
               </div>
               <h2 className="text-3xl font-bold text-white mb-3">

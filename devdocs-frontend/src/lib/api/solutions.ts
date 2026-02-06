@@ -10,8 +10,12 @@ export const solutionsApi = {
     language?: string;
     tag?: string;
   }) => {
-    const { data } = await apiClient.get('/api/solutions', { params });
-    return data.solutions; // Extract solutions array from response
+    const response = await apiClient.get('/api/solutions', { params });
+    console.log('[Solutions API] Full response:', response);
+    console.log('[Solutions API] Response data:', response.data);
+    // Backend returns { solutions: [...], total: X, page: X, page_size: X, total_pages: X }
+    // We need to extract just the solutions array
+    return response.data.solutions || [];
   },
 
   // Get single solution
@@ -52,7 +56,7 @@ export const solutionsApi = {
   // Recent solutions
   getRecent: async (limit: number = 10) => {
     const { data } = await apiClient.get('/api/dashboard/recent', { params: { limit } });
-    return data.recent_solutions; // Extract recent_solutions array
+    return data.recent_solutions || []; // Extract recent_solutions array, default to empty array
   },
 
   // Popular tags

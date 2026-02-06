@@ -56,7 +56,7 @@ export function Header() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-opacity group">
+          <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-opacity group cursor-pointer">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-cyan-400 to-cyan-600 text-white font-bold shadow-lg shadow-cyan-400/30 group-hover:shadow-cyan-400/50 transition-shadow">
               D
             </div>

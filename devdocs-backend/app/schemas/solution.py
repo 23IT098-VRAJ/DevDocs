@@ -6,6 +6,8 @@ from typing import List, Optional
 from datetime import datetime
 import uuid
 
+from app.config import settings
+
 
 # ============================================================================
 # Base Schemas
@@ -40,7 +42,8 @@ class SolutionBase(BaseModel):
     tags: List[str] = Field(
         ...,
         min_length=1,
-        description="List of tags (at least 1 required)"
+        max_length=20,
+        description="List of tags (1-20 tags required)"
     )
     
     @field_validator('tags')
@@ -49,6 +52,9 @@ class SolutionBase(BaseModel):
         """Validate tags are not empty and normalize them"""
         if not v or len(v) == 0:
             raise ValueError("At least one tag is required")
+        
+        if len(v) > 20:
+            raise ValueError("Maximum 20 tags allowed")
         
         # Remove empty tags and strip whitespace
         cleaned_tags = [tag.strip().lower() for tag in v if tag.strip()]
@@ -61,8 +67,14 @@ class SolutionBase(BaseModel):
     @field_validator('language')
     @classmethod
     def validate_language(cls, v: str) -> str:
-        """Normalize language to lowercase"""
-        return v.strip().lower()
+        """Normalize language to lowercase and validate against known languages"""
+        normalized = v.strip().lower()
+        
+        if normalized not in settings.SUPPORTED_LANGUAGES:
+            # Log warning but don't reject - allow flexibility
+            print(f"⚠️ Warning: Unknown language '{normalized}' - Consider using one of: {', '.join(settings.SUPPORTED_LANGUAGES[:10])}...")
+        
+        return normalized
 
 
 # ============================================================================
@@ -131,6 +143,7 @@ class SolutionResponse(SolutionBase):
     created_at: datetime
     updated_at: datetime
     is_archived: bool = False
+    is_bookmarked: bool = False  # Indicates if current user bookmarked this solution
     
     class Config:
         from_attributes = True  # Enable ORM mode (SQLAlchemy compatibility)

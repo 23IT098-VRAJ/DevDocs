@@ -110,10 +110,8 @@ temp/
 *~
 
 # Documentation that shouldn't be versioned
-PROGRESS.md
-PROJECT_STATUS.md
-IMPLEMENTATION_GUIDE.md
-API_TEST_GUIDE.md
+
+PRODUCTION_READINESS_REPORT.md
 
 # Lock files (optional - uncomment if you want to ignore them)
 # yarn.lock

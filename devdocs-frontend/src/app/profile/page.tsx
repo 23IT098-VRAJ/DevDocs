@@ -43,6 +43,7 @@ export default function ProfilePage() {
   }
 
   // Form state
+  const [isEditing, setIsEditing] = useState(false);
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
@@ -66,12 +67,22 @@ export default function ProfilePage() {
       // TODO: Implement API call to update user profile
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
       setSaveSuccess(true);
+      setIsEditing(false); // Exit edit mode after save
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Failed to save profile:', error);
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Handle cancel editing
+  const handleCancelEdit = () => {
+    // Reset form to original values
+    setFullName(user?.user_metadata?.full_name || '');
+    setUsername('');
+    setBio('');
+    setIsEditing(false);
   };
 
   // Handle password change
@@ -189,78 +200,162 @@ export default function ProfilePage() {
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 mb-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-white">Personal Information</h2>
-            <Edit className="w-5 h-5 text-white/40" />
+            {!isEditing && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-white transition-colors"
+              >
+                <Edit className="w-4 h-4" />
+                <span className="text-sm font-medium">Edit</span>
+              </button>
+            )}
           </div>
 
-          <div className="space-y-4">
-            {/* Full Name */}
-            <div>
-              <label className="block text-white/80 text-sm font-medium mb-2">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-white placeholder-white/40 focus:border-[#07b9d5] focus:ring-1 focus:ring-[#07b9d5] transition-colors"
-                placeholder="Enter your full name"
-              />
-            </div>
+          {/* View Mode */}
+          {!isEditing ? (
+            <div className="space-y-4">
+              {/* Full Name - View */}
+              <div className="pb-4 border-b border-white/10">
+                <label className="block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider">
+                  Full Name
+                </label>
+                <p className="text-white text-base">
+                  {fullName || 'Not set'}
+                </p>
+              </div>
 
-            {/* Username */}
-            <div>
-              <label className="block text-white/80 text-sm font-medium mb-2">
-                Username
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">@</span>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full h-12 bg-white/5 border border-white/10 rounded-xl pl-8 pr-4 text-white placeholder-white/40 focus:border-[#07b9d5] focus:ring-1 focus:ring-[#07b9d5] transition-colors"
-                  placeholder="username"
-                />
+              {/* Username - View */}
+              <div className="pb-4 border-b border-white/10">
+                <label className="block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider">
+                  Username
+                </label>
+                <p className="text-white text-base">
+                  {username ? `@${username}` : 'Not set'}
+                </p>
+              </div>
+
+              {/* Email - View (Read-only) */}
+              <div className="pb-4 border-b border-white/10">
+                <label className="block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider">
+                  Email Address
+                </label>
+                <p className="text-white text-base">
+                  {user?.email}
+                </p>
+              </div>
+
+              {/* Bio - View */}
+              <div>
+                <label className="block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider">
+                  Bio
+                </label>
+                <p className="text-white text-base whitespace-pre-wrap">
+                  {bio || 'No bio added yet'}
+                </p>
               </div>
             </div>
+          ) : (
+            /* Edit Mode */
+            <div className="space-y-4">
+              {/* Full Name - Edit */}
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-white placeholder-white/40 focus:border-[#07b9d5] focus:ring-1 focus:ring-[#07b9d5] transition-colors"
+                  placeholder="Enter your full name"
+                />
+              </div>
 
-            {/* Bio */}
-            <div>
-              <label className="block text-white/80 text-sm font-medium mb-2">
-                Bio
-              </label>
-              <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={4}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:border-[#07b9d5] focus:ring-1 focus:ring-[#07b9d5] transition-colors resize-none"
-                placeholder="Tell us about yourself..."
-              />
+              {/* Username - Edit */}
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-2">
+                  Username
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">@</span>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl pl-8 pr-4 text-white placeholder-white/40 focus:border-[#07b9d5] focus:ring-1 focus:ring-[#07b9d5] transition-colors"
+                    placeholder="username"
+                  />
+                </div>
+              </div>
+
+              {/* Email - Read-only even in edit mode */}
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-white/60 cursor-not-allowed"
+                />
+                <p className="text-white/40 text-xs mt-1">Email cannot be changed</p>
+              </div>
+
+              {/* Bio - Edit */}
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-2">
+                  Bio
+                </label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  rows={4}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:border-[#07b9d5] focus:ring-1 focus:ring-[#07b9d5] transition-colors resize-none"
+                  placeholder="Tell us about yourself..."
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 pt-4">
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={isSaving}
+                  className={`flex-1 h-12 rounded-xl font-medium transition-all ${
+                    saveSuccess
+                      ? 'bg-green-500 text-white'
+                      : 'bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-white hover:shadow-lg hover:shadow-[#07b9d5]/20'
+                  } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : saveSuccess ? (
+                    <>
+                      <Check className="w-5 h-5" />
+                      <span>Saved!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-5 h-5" />
+                      <span>Save Changes</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                  className="px-6 h-12 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-
-            {/* Save Button */}
-            <button
-              onClick={handleSaveProfile}
-              disabled={isSaving}
-              className={`w-full h-12 rounded-xl font-medium transition-all ${
-                saveSuccess
-                  ? 'bg-green-500 text-white'
-                  : 'bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-white hover:shadow-lg hover:shadow-[#07b9d5]/20'
-              } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
-            >
-              {saveSuccess ? (
-                <>
-                  <Check className="w-5 h-5" />
-                  Saved Successfully
-                </>
-              ) : isSaving ? (
-                'Saving...'
-              ) : (
-                'Save Changes'
-              )}
-            </button>
-          </div>
+          )}
         </div>
+
 
         {/* Security & Access */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 mb-6">

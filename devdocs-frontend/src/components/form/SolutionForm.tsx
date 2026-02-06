@@ -34,6 +34,11 @@ interface SolutionFormProps {
   onSuccess?: (solution: Solution) => void;
   
   /**
+   * Callback when submitting state changes
+   */
+  onSubmittingChange?: (isSubmitting: boolean) => void;
+  
+  /**
    * Custom className
    */
   className?: string;
@@ -63,6 +68,7 @@ export function SolutionForm({
   solution,
   mode,
   onSuccess,
+  onSubmittingChange,
   className = '',
 }: SolutionFormProps) {
   const router = useRouter();
@@ -80,6 +86,13 @@ export function SolutionForm({
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Notify parent when submitting state changes
+  useEffect(() => {
+    if (onSubmittingChange) {
+      onSubmittingChange(isSubmitting);
+    }
+  }, [isSubmitting, onSubmittingChange]);
 
   // Validate form
   function validateForm(): boolean {
@@ -205,7 +218,7 @@ export function SolutionForm({
           value={formData.title}
           onChange={(e) => handleChange('title', e.target.value)}
           placeholder="e.g., Asynchronous API Fetching in React"
-          className="w-full rounded-lg text-white bg-black border border-white/10 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] h-14 px-4 text-lg font-medium placeholder:text-white/40 transition-all"
+          className="w-full rounded-lg text-white bg-black border border-white/20 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] h-14 px-4 text-lg font-medium placeholder:text-white/40 transition-all"
         />
         {errors.title && (
           <p className="text-sm text-red-400">{errors.title}</p>
@@ -223,13 +236,54 @@ export function SolutionForm({
           value={formData.description}
           onChange={(e) => handleChange('description', e.target.value)}
           placeholder="Explain the context, prerequisites, and how this solution works..."
-          className="w-full rounded-lg text-white bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] min-h-[140px] p-4 text-base placeholder:text-white/40 transition-all resize-y"
+          className="w-full rounded-lg text-white bg-black border border-white/20 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] min-h-[140px] p-4 text-base placeholder:text-white/40 transition-all resize-y"
           rows={6}
         />
         {errors.description && (
           <p className="text-sm text-red-400">{errors.description}</p>
         )}
         <p className="text-xs text-white/40">{formData.description.length}/{VALIDATION.DESCRIPTION.MAX} characters</p>
+      </div>
+
+      {/* Language & Framework Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Language Dropdown */}
+        <div className="flex flex-col gap-2">
+          <label className="text-white text-base font-medium">
+            Language <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <select
+              value={formData.language}
+              onChange={(e) => handleChange('language', e.target.value)}
+              className="w-full appearance-none rounded-lg text-white bg-black border border-white/20 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] h-12 px-4 pr-10 text-base cursor-pointer transition-all [&>option]:bg-black [&>option]:text-white"
+            >
+              {LANGUAGES.map((lang) => (
+                <option key={lang} value={lang.toLowerCase()} className="bg-black text-white">
+                  {lang}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white/40">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+          {errors.language && (
+            <p className="text-sm text-red-400">{errors.language}</p>
+          )}
+        </div>
+
+        {/* Framework Input */}
+        <div className="flex flex-col gap-2">
+          <label className="text-white text-base font-medium">Framework / Lib</label>
+          <input
+            type="text"
+            placeholder="e.g. React 18"
+            className="w-full rounded-lg text-white bg-black border border-white/20 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] h-12 px-4 text-base placeholder:text-white/40 transition-all"
+          />
+        </div>
       </div>
 
       {/* Code Editor */}
@@ -248,9 +302,9 @@ export function SolutionForm({
         </label>
         
         {/* Code Editor Container */}
-        <div className="w-full rounded-xl overflow-hidden border border-white/10 bg-black/80 backdrop-blur-sm shadow-xl flex flex-col group focus-within:ring-1 focus-within:ring-[#07b9d5]/50 focus-within:border-[#07b9d5]/50 transition-all">
+        <div className="w-full rounded-xl overflow-hidden border border-white/20 bg-black backdrop-blur-sm shadow-xl flex flex-col group focus-within:ring-1 focus-within:ring-[#07b9d5]/50 focus-within:border-[#07b9d5]/50 transition-all">
           {/* Editor Toolbar */}
-          <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
+          <div className="flex items-center justify-between px-4 py-2 bg-black border-b border-white/20">
             <div className="flex items-center gap-2 text-white/60 text-sm">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
@@ -302,88 +356,47 @@ export function SolutionForm({
         )}
       </div>
 
-      {/* Metadata Row */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Language Dropdown */}
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-2">
-          <label className="text-white text-base font-medium">
-            Language <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              value={formData.language}
-              onChange={(e) => handleChange('language', e.target.value)}
-              className="w-full appearance-none rounded-lg text-white bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] h-12 px-4 pr-10 text-base cursor-pointer transition-all [&>option]:bg-black [&>option]:text-white"
-            >
-              {LANGUAGES.map((lang) => (
-                <option key={lang} value={lang.toLowerCase()} className="bg-black text-white">
-                  {lang}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white/40">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-          {errors.language && (
-            <p className="text-sm text-red-400">{errors.language}</p>
-          )}
-        </div>
-
-        {/* Framework Input */}
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-2">
-          <label className="text-white text-base font-medium">Framework / Lib</label>
+      {/* Tags Input with Chips */}
+      <div className="flex flex-col gap-2">
+        <label className="text-white text-base font-medium">
+          Tags <span className="text-red-500">*</span>
+        </label>
+        <div className="w-full rounded-lg border border-white/20 bg-black focus-within:border-[#07b9d5] focus-within:ring-1 focus-within:ring-[#07b9d5] min-h-[3rem] px-2 py-1.5 flex flex-wrap items-center gap-2 transition-all cursor-text">
+          {/* Tag Chips */}
+          {formData.tags
+            .split(',')
+            .map(t => t.trim())
+            .filter(t => t.length > 0)
+            .map((tag, index) => (
+              <div key={index} className="bg-[#07b9d5]/20 border border-[#07b9d5]/30 rounded-md px-2 py-1 flex items-center gap-1.5 group">
+                <span className="text-[#07b9d5] text-sm font-medium">{tag}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const tags = formData.tags.split(',').map(t => t.trim()).filter(t => t !== tag);
+                    handleChange('tags', tags.join(', '));
+                  }}
+                  className="text-[#07b9d5]/70 hover:text-[#07b9d5] transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          {/* Input */}
           <input
             type="text"
-            placeholder="e.g. React 18"
-            className="w-full rounded-lg text-white bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-[#07b9d5] focus:border-[#07b9d5] h-12 px-4 text-base placeholder:text-white/40 transition-all"
+            value={formData.tags}
+            onChange={(e) => handleChange('tags', e.target.value)}
+            placeholder="Add tag..."
+            className="bg-transparent border-none focus:ring-0 text-white placeholder:text-white/40 min-w-[80px] flex-1 text-base h-8 p-0"
           />
         </div>
-
-        {/* Tags Input with Chips */}
-        <div className="col-span-1 md:col-span-6 flex flex-col gap-2">
-          <label className="text-white text-base font-medium">
-            Tags <span className="text-red-500">*</span>
-          </label>
-          <div className="w-full rounded-lg border border-white/10 bg-white/5 focus-within:border-[#07b9d5] focus-within:ring-1 focus-within:ring-[#07b9d5] min-h-[3rem] px-2 py-1.5 flex flex-wrap items-center gap-2 transition-all cursor-text">
-            {/* Tag Chips */}
-            {formData.tags
-              .split(',')
-              .map(t => t.trim())
-              .filter(t => t.length > 0)
-              .map((tag, index) => (
-                <div key={index} className="bg-[#07b9d5]/20 border border-[#07b9d5]/30 rounded-md px-2 py-1 flex items-center gap-1.5 group">
-                  <span className="text-[#07b9d5] text-sm font-medium">{tag}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const tags = formData.tags.split(',').map(t => t.trim()).filter(t => t !== tag);
-                      handleChange('tags', tags.join(', '));
-                    }}
-                    className="text-[#07b9d5]/70 hover:text-[#07b9d5] transition-colors"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            {/* Input */}
-            <input
-              type="text"
-              value={formData.tags}
-              onChange={(e) => handleChange('tags', e.target.value)}
-              placeholder="Add tag..."
-              className="bg-transparent border-none focus:ring-0 text-white placeholder:text-white/40 min-w-[80px] flex-1 text-base h-8 p-0"
-            />
-          </div>
-          {errors.tags && (
-            <p className="text-sm text-red-400">{errors.tags}</p>
-          )}
-          <p className="text-xs text-white/40">Separate tags with commas</p>
-        </div>
+        {errors.tags && (
+          <p className="text-sm text-red-400">{errors.tags}</p>
+        )}
+        <p className="text-xs text-white/40">Separate tags with commas</p>
       </div>
     </form>
   );

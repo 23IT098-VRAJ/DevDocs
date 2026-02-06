@@ -15,7 +15,7 @@ export function DashboardSidebar() {
 
   const navItems = [
     { name: 'Dashboard', path: '/', icon: 'dashboard', filled: true },
-    { name: 'Search', path: '/search', icon: 'search' },
+    { name: 'Search', path: '/search', icon: 'search', badge: 'AI' },
     { name: 'Browse', path: '/solution', icon: 'explore' },
     { name: 'New Solution', path: '/solution/create', icon: 'add_circle' },
     { name: 'Profile', path: '/profile', icon: 'person' },
@@ -53,14 +53,19 @@ export function DashboardSidebar() {
               href={item.path}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all group ${
                 active
-                  ? 'bg-[#07b9d5]/10 border border-[#07b9d5]/20 text-[#07b9d5]'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-black border border-[#07b9d5]/30 text-[#07b9d5]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
               }`}
             >
               <span className={`material-symbols-outlined ${item.filled && active ? 'filled' : ''}`}>
                 {item.icon}
               </span>
               <span className="text-sm font-medium">{item.name}</span>
+              {item.badge && (
+                <span className="ml-auto bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-black text-[10px] font-bold px-2 py-1 rounded-md shadow-sm">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           );
         })}

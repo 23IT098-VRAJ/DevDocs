@@ -3,6 +3,7 @@ DevDocs Backend - Configuration Settings
 """
 from pydantic_settings import BaseSettings
 from typing import List
+from pathlib import Path
 
 
 class Settings(BaseSettings):
@@ -17,7 +18,7 @@ class Settings(BaseSettings):
     DATABASE_POOL_TIMEOUT: int = 30
     
     # Application
-    ENVIRONMENT: str = "development"
+    ENVIRONMENT: str = "development"  # production, staging, development
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
     API_RELOAD: bool = True
@@ -30,18 +31,27 @@ class Settings(BaseSettings):
     ]
     
     # Security
-    JWT_SECRET_KEY: str = "change-this-to-random-secret-key-in-production"
+    JWT_SECRET_KEY: str  # REQUIRED - No default, must be set in .env
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_MINUTES: int = 1440  # 24 hours
     
-    # Supabase (optional - for auth integration)
-    SUPABASE_URL: str = ""
-    SUPABASE_KEY: str = ""
+    # Supabase (REQUIRED for authentication)
+    SUPABASE_URL: str  # REQUIRED - No default
+    SUPABASE_JWT_SECRET: str  # REQUIRED - No default
+    SUPABASE_KEY: str = ""  # Optional API key
     
     # AI/ML Settings
-    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
-    EMBEDDING_DIMENSIONS: int = 384
-    MODEL_CACHE_DIR: str = "./models"
+    EMBEDDING_MODEL: str = "sentence-transformers/all-mpnet-base-v2"
+    EMBEDDING_DIMENSION: int = 768  # all-mpnet-base-v2 uses 768 dimensions
+    MODEL_CACHE_DIR: str = str(Path.home() / ".cache" / "devdocs" / "models")
+    
+    # Supported Programming Languages
+    SUPPORTED_LANGUAGES: List[str] = [
+        "python", "javascript", "typescript", "java", "cpp", "c", "csharp", "go",
+        "rust", "ruby", "php", "swift", "kotlin", "scala", "dart", "r",
+        "sql", "html", "css", "shell", "bash", "powershell", "dockerfile",
+        "yaml", "json", "xml", "markdown", "other"
+    ]
     
     # Logging
     LOG_LEVEL: str = "INFO"
@@ -58,4 +68,8 @@ class Settings(BaseSettings):
 
 
 # Global settings instance
-settings = Settings()
+try:
+    settings = Settings(_env_file=".env")  # type: ignore[call-arg]
+except Exception:
+    # Fallback if .env not found
+    settings = Settings()  # type: ignore[call-arg]

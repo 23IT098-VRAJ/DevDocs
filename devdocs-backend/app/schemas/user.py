@@ -3,7 +3,7 @@ DevDocs Backend - User Schemas
 Pydantic models for user data validation and serialization
 """
 
-from pydantic import BaseModel, EmailStr, Field, HttpUrl
+from pydantic import BaseModel, EmailStr, Field, HttpUrl, field_validator
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
@@ -19,9 +19,9 @@ class UserBase(BaseModel):
 
 class UserProfile(BaseModel):
     """User profile information"""
-    bio: Optional[str] = None
-    github_username: Optional[str] = None
-    twitter_username: Optional[str] = None
+    bio: Optional[str] = Field(None, max_length=500)
+    github_username: Optional[str] = Field(None, max_length=255)
+    twitter_username: Optional[str] = Field(None, max_length=255)
     website_url: Optional[HttpUrl] = None
     avatar_url: Optional[HttpUrl] = None
 
@@ -41,10 +41,10 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     """Schema for updating user profile"""
-    full_name: Optional[str] = None
-    bio: Optional[str] = None
-    github_username: Optional[str] = None
-    twitter_username: Optional[str] = None
+    full_name: Optional[str] = Field(None, max_length=255)
+    bio: Optional[str] = Field(None, max_length=500)
+    github_username: Optional[str] = Field(None, max_length=255)
+    twitter_username: Optional[str] = Field(None, max_length=255)
     website_url: Optional[HttpUrl] = None
     avatar_url: Optional[HttpUrl] = None
     theme: Optional[str] = Field(None, pattern="^(dark|light)$")
@@ -70,6 +70,14 @@ class UserResponse(UserBase):
     last_login_at: Optional[datetime] = None
     is_active: bool
     is_verified: bool
+
+    @field_validator('avatar_url', 'website_url', mode='before')
+    @classmethod
+    def empty_str_to_none(cls, v):
+        """Convert empty strings to None for URL fields"""
+        if v == '' or v is None:
+            return None
+        return v
 
     class Config:
         from_attributes = True
