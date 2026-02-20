@@ -49,10 +49,6 @@ class Settings(BaseSettings):
         "yaml", "json", "xml", "markdown", "other"
     ]
 
-    # Redis (embedding cache) — optional, falls back gracefully if not set
-    REDIS_URL: str = "redis://localhost:6379"
-    REDIS_EMBEDDING_TTL: int = 3600  # seconds (1 hour)
-
     # Gemini AI — for answer generation and smart tagging
     GEMINI_API_KEY: str = ""
 

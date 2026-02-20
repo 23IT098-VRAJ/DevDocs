@@ -17,7 +17,6 @@ from app.routers import solutions, search, dashboard, auth, bookmarks
 from app.models.embedding import EmbeddingService
 from app.logger import setup_logging, get_logger
 from app.exceptions import register_exception_handlers
-from app.services import cache as redis_cache
 from app.services import gemini
 
 # Initialize logging
@@ -103,9 +102,6 @@ async def lifespan(app: FastAPI):
         logger.warning(f"⚠️ Warning: Failed to load embedding model: {e}")
         logger.warning("⚠️ Semantic search will not be available")
 
-    # Connect to Redis (embedding cache — optional)
-    await redis_cache.init_redis()
-
     # Init Gemini (AI answers + smart tagging — optional)
     gemini.init_gemini()
 
@@ -113,7 +109,6 @@ async def lifespan(app: FastAPI):
 
     # Cleanup on shutdown
     logger.info("👋 Shutting down DevDocs Backend...")
-    await redis_cache.close_redis()
 
 
 # ============================================================================
