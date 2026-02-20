@@ -147,7 +147,7 @@ export default function SearchPage() {
       <GlassmorphicNavbar />
       <div className="pt-20 flex">
         {/* Left Sidebar: Filters */}
-        <aside className="w-80 border-r border-white/20 bg-black p-6 flex flex-col gap-6 shrink-0 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto hidden lg:block">
+        <aside className="w-80 border-r border-white/20 bg-black p-6 shrink-0 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto hidden lg:flex lg:flex-col lg:gap-6">
           <div>
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Sparkles size={20} className="text-[#07b9d5]" />
@@ -196,7 +196,7 @@ export default function SearchPage() {
           </div>
 
           {/* Pro Tip Card */}
-          <div className="mt-auto backdrop-blur-xl bg-gradient-to-br from-[#07b9d5]/10 to-[#059ab3]/5 p-4 rounded-xl border border-[#07b9d5]/20">
+          <div className="mt-auto backdrop-blur-xl bg-linear-to-br from-[#07b9d5]/10 to-[#059ab3]/5 p-4 rounded-xl border border-[#07b9d5]/20">
             <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
               <Sparkles size={16} className="text-[#07b9d5]" />
               Pro Tip
@@ -238,7 +238,7 @@ export default function SearchPage() {
                   />
                   <button
                     type="submit"
-                    className="mr-2 h-10 px-5 rounded-lg bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-black text-sm font-bold hover:shadow-lg hover:shadow-[#07b9d5]/50 transition-all flex items-center gap-2"
+                    className="mr-2 h-10 px-5 rounded-lg bg-linear-to-r from-[#07b9d5] to-[#059ab3] text-black text-sm font-bold hover:shadow-lg hover:shadow-[#07b9d5]/50 transition-all flex items-center gap-2"
                   >
                     <span className="hidden sm:inline">Search</span>
                     <ChevronRight size={18} />
@@ -293,7 +293,7 @@ export default function SearchPage() {
             {/* Empty State - No Query */}
             {!debouncedQuery && !isSearching && (
               <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-20 h-20 bg-gradient-to-br from-[#07b9d5]/20 to-[#059ab3]/10 rounded-2xl flex items-center justify-center mb-6 border border-[#07b9d5]/30">
+                <div className="w-20 h-20 bg-linear-to-br from-[#07b9d5]/20 to-[#059ab3]/10 rounded-2xl flex items-center justify-center mb-6 border border-[#07b9d5]/30">
                   <Sparkles size={40} className="text-[#07b9d5]" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-3">AI-Powered Semantic Search</h3>
@@ -346,8 +346,8 @@ export default function SearchPage() {
                         </p>
                       </div>
                       {result.similarity && (
-                        <div className="ml-4 flex-shrink-0">
-                          <div className="flex items-center gap-2 bg-gradient-to-r from-[#07b9d5]/20 to-[#059ab3]/10 border border-[#07b9d5]/30 px-3 py-1.5 rounded-lg">
+                        <div className="ml-4 shrink-0">
+                          <div className="flex items-center gap-2 bg-linear-to-r from-[#07b9d5]/20 to-[#059ab3]/10 border border-[#07b9d5]/30 px-3 py-1.5 rounded-lg">
                             <TrendingUp size={14} className="text-[#07b9d5]" />
                             <span className="text-[#07b9d5] font-bold text-sm">
                               {Math.round(result.similarity * 100)}% Match
@@ -370,7 +370,7 @@ export default function SearchPage() {
                           <code>{result.solution.code.substring(0, 300)}{result.solution.code.length > 300 ? '...' : ''}</code>
                         </pre>
                         {result.solution.code.length > 300 && (
-                          <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                          <div className="absolute bottom-0 left-0 w-full h-8 bg-linear-to-t from-black/60 to-transparent pointer-events-none"></div>
                         )}
                       </div>
                     )}

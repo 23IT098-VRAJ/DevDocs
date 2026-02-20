@@ -35,7 +35,7 @@ export default function AuthenticatedHome() {
       <div className="max-w-7xl mx-auto">
         {/* Welcome Section */}
         <div className="mb-8 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#07b9d5]/20 via-transparent to-transparent blur-3xl"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-[#07b9d5]/20 via-transparent to-transparent blur-3xl"></div>
           <div className="relative backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-8">
             <h1 className="text-4xl font-bold mb-2">
               Welcome back, <span className="text-[#07b9d5]">{user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Developer'}</span>
@@ -47,9 +47,9 @@ export default function AuthenticatedHome() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Total Solutions Card - Enhanced with Graph */}
-          <div className="relative backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-6 overflow-hidden group hover:border-[#07b9d5]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#07b9d5]/20 min-h-[320px]">
+          <div className="relative backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-6 overflow-hidden group hover:border-[#07b9d5]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#07b9d5]/20 min-h-80">
             {/* Animated Background Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#07b9d5]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-[#07b9d5]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#07b9d5]/5 rounded-full blur-3xl"></div>
@@ -58,7 +58,7 @@ export default function AuthenticatedHome() {
             <div className="relative z-10 flex flex-col h-full">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 bg-gradient-to-br from-[#07b9d5] to-[#059ab3] rounded-xl flex items-center justify-center shadow-lg shadow-[#07b9d5]/30 group-hover:shadow-[#07b9d5]/50 group-hover:scale-110 transition-all duration-300">
+                  <div className="w-14 h-14 bg-linear-to-br from-[#07b9d5] to-[#059ab3] rounded-xl flex items-center justify-center shadow-lg shadow-[#07b9d5]/30 group-hover:shadow-[#07b9d5]/50 group-hover:scale-110 transition-all duration-300">
                     <span className="material-symbols-outlined text-white text-3xl">terminal</span>
                   </div>
                   <div>
@@ -82,7 +82,7 @@ export default function AuthenticatedHome() {
                     return (
                       <div key={i} className="flex-1 flex flex-col items-center gap-2">
                         <div 
-                          className="w-full bg-gradient-to-t from-[#07b9d5] to-cyan-400 rounded-t-lg relative group/bar transition-all duration-500 hover:from-[#07b9d5] hover:to-[#3ae0ff] cursor-pointer"
+                          className="w-full bg-linear-to-t from-[#07b9d5] to-cyan-400 rounded-t-lg relative group/bar transition-all duration-500 hover:from-[#07b9d5] hover:to-[#3ae0ff] cursor-pointer"
                           style={{
                             height: `${heightPercent}%`,
                             transitionDelay: `${i * 50}ms`,
@@ -111,9 +111,9 @@ export default function AuthenticatedHome() {
           </div>
 
           {/* Language Distribution Card - Enhanced with Pie Chart */}
-          <div className="relative backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-6 overflow-hidden group hover:border-[#07b9d5]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#07b9d5]/20 min-h-[320px]">
+          <div className="relative backdrop-blur-2xl bg-black border border-white/20 rounded-2xl p-6 overflow-hidden group hover:border-[#07b9d5]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#07b9d5]/20 min-h-80">
             {/* Animated Background Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#07b9d5]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-[#07b9d5]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             {/* Decorative Elements */}
             <div className="absolute top-0 left-0 w-32 h-32 bg-[#07b9d5]/5 rounded-full blur-3xl"></div>
@@ -122,7 +122,7 @@ export default function AuthenticatedHome() {
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 bg-gradient-to-br from-[#07b9d5] to-[#059ab3] rounded-xl flex items-center justify-center shadow-lg shadow-[#07b9d5]/30 group-hover:shadow-[#07b9d5]/50 group-hover:scale-110 transition-all duration-300">
+                  <div className="w-14 h-14 bg-linear-to-br from-[#07b9d5] to-[#059ab3] rounded-xl flex items-center justify-center shadow-lg shadow-[#07b9d5]/30 group-hover:shadow-[#07b9d5]/50 group-hover:scale-110 transition-all duration-300">
                     <span className="material-symbols-outlined text-white text-3xl">translate</span>
                   </div>
                   <div>
@@ -139,13 +139,13 @@ export default function AuthenticatedHome() {
                 <div className="flex items-center justify-center h-32">
                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#07b9d5]"></div>
                 </div>
-              ) : stats?.language_breakdown && stats.language_breakdown.length > 0 ? (
+              ) : languageDistribution && languageDistribution.length > 0 ? (
                 <div className="flex flex-col lg:flex-row gap-4 mt-4">
                   {/* Pie Chart */}
-                  <div className="flex-shrink-0 flex items-center justify-center lg:items-start">
+                  <div className="shrink-0 flex items-center justify-center lg:items-start">
                     <svg width="180" height="180" viewBox="0 0 200 200" className="transform -rotate-90">
                       {(() => {
-                        const total = stats.total_solutions || 1;
+                        const total = stats?.total_solutions || 1;
                         let currentAngle = 0;
                         const colors = [
                           '#07b9d5', '#06a5bf', '#0e7490', '#0c6682', 
@@ -153,7 +153,7 @@ export default function AuthenticatedHome() {
                           '#7c3aed', '#c026d3', '#db2777', '#dc2626'
                         ];
                         
-                        return stats.language_breakdown.map((lang: any, index: number) => {
+                        return languageDistribution.map((lang: any, index: number) => {
                           const percentage = (lang.count / total) * 100;
                           const angle = (percentage / 100) * 360;
                           const startAngle = currentAngle;
@@ -194,20 +194,21 @@ export default function AuthenticatedHome() {
                   </div>
                   
                   {/* Legend */}
-                  <div className="flex-1 space-y-1.5 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar">
-                    {stats.language_breakdown.map((lang: any, index: number) => {
+                  <div className="flex-1 space-y-1.5 max-h-45 overflow-y-auto pr-2 custom-scrollbar">
+                    {languageDistribution.map((lang: any, index: number) => {
                       const colors = [
                         '#07b9d5', '#06a5bf', '#0e7490', '#0c6682', 
                         '#14b8a6', '#0891b2', '#0284c7', '#2563eb',
                         '#7c3aed', '#c026d3', '#db2777', '#dc2626'
                       ];
-                      const percentage = ((lang.count / (stats.total_solutions || 1)) * 100).toFixed(1);
+                      const total = languageDistribution.reduce((sum, l) => sum + l.count, 0) || 1;
+                      const percentage = ((lang.count / total) * 100).toFixed(1);
                       
                       return (
                         <div key={lang.language} className="flex items-center justify-between gap-2 group/lang hover:bg-slate-800/30 rounded px-2 py-1 transition-colors">
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <div 
-                              className="w-2.5 h-2.5 rounded-sm flex-shrink-0" 
+                              className="w-2.5 h-2.5 rounded-sm shrink-0" 
                               style={{ 
                                 backgroundColor: colors[index % colors.length],
                                 boxShadow: `0 0 6px ${colors[index % colors.length]}40`
@@ -215,9 +216,9 @@ export default function AuthenticatedHome() {
                             ></div>
                             <span className="text-xs text-slate-300 font-medium truncate">{lang.language}</span>
                           </div>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <div className="flex items-center gap-1.5 shrink-0">
                             <span className="text-[10px] text-slate-500 tabular-nums">{lang.count}</span>
-                            <span className="text-xs font-bold text-[#07b9d5] tabular-nums min-w-[2.5rem] text-right">{percentage}%</span>
+                            <span className="text-xs font-bold text-[#07b9d5] tabular-nums min-w-10 text-right">{percentage}%</span>
                           </div>
                         </div>
                       );
@@ -274,7 +275,7 @@ export default function AuthenticatedHome() {
                     className="w-full bg-black border border-white/20 rounded-xl p-4 hover:border-[#07b9d5] transition-colors text-left group"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-[#07b9d5] to-[#059ab3] rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 bg-linear-to-br from-[#07b9d5] to-[#059ab3] rounded-lg flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined text-white text-xl">
                           code
                         </span>

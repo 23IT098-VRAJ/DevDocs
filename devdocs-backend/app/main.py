@@ -66,11 +66,14 @@ async def lifespan(app: FastAPI):
     # Log CORS configuration
     logger.info(f"🌐 CORS Origins configured: {settings.CORS_ORIGINS}")
     logger.info(f"🌐 CORS Origins type: {type(settings.CORS_ORIGINS)}")
+    logger.info(f"🌐 Environment: {settings.ENVIRONMENT}")
     
     # Validate CORS in production
     if settings.ENVIRONMENT == "production":
         if "*" in settings.CORS_ORIGINS:
             raise ValueError("CORS_ORIGINS cannot contain wildcard '*' in production")
+    else:
+        logger.info("⚠️  CORS set to allow all origins (development mode)")
     
     logger.info("✅ Configuration validated")
     

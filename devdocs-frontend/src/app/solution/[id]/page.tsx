@@ -183,13 +183,13 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
             Solutions
           </Link>
           <ChevronRight size={14} className="text-white/40" />
-          <span className="text-[#07b9d5] truncate max-w-[300px]">{solution.title}</span>
+          <span className="text-[#07b9d5] truncate max-w-75">{solution.title}</span>
         </div>
 
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 mb-8 border-b border-white/10">
           <div className="flex flex-col gap-3 flex-1">
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-[#07b9d5] break-words">
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-[#07b9d5] wrap-break-word">
               {solution.title}
             </h1>
             {/* Meta Text */}
@@ -214,7 +214,7 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
             </Link>
             <button 
               onClick={handleShare}
-              className="flex items-center gap-2 h-10 px-5 rounded-lg bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-black text-sm font-bold shadow-lg shadow-[#07b9d5]/20 hover:shadow-[#07b9d5]/40 transition-all"
+              className="flex items-center gap-2 h-10 px-5 rounded-lg bg-linear-to-r from-[#07b9d5] to-[#059ab3] text-black text-sm font-bold shadow-lg shadow-[#07b9d5]/20 hover:shadow-[#07b9d5]/40 transition-all"
             >
               {linkCopied ? (
                 <>

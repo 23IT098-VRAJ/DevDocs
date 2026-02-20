@@ -23,12 +23,8 @@ class Settings(BaseSettings):
     API_PORT: int = 8000
     API_RELOAD: bool = True
     
-    # CORS
-    CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000"
-    ]
+    # CORS - In development, allow all origins. In production, specify exact origins.
+    CORS_ORIGINS: List[str] = ["*"]  # Allow all in development
     
     # Security
     JWT_SECRET_KEY: str  # REQUIRED - No default, must be set in .env

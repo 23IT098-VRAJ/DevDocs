@@ -122,7 +122,7 @@ export default function BookmarksPage() {
           {/* Page Header */}
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#07b9d5]/20 to-[#059ab3]/10 rounded-xl flex items-center justify-center border border-[#07b9d5]/30">
+              <div className="w-12 h-12 bg-linear-to-br from-[#07b9d5]/20 to-[#059ab3]/10 rounded-xl flex items-center justify-center border border-[#07b9d5]/30">
                 <BookmarkCheck size={24} className="text-[#07b9d5]" />
               </div>
               <div>
@@ -143,7 +143,7 @@ export default function BookmarksPage() {
           {/* Empty State */}
           {!isLoading && solutions.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#07b9d5]/20 to-[#059ab3]/10 rounded-2xl flex items-center justify-center mb-6 border border-[#07b9d5]/30">
+              <div className="w-20 h-20 bg-linear-to-br from-[#07b9d5]/20 to-[#059ab3]/10 rounded-2xl flex items-center justify-center mb-6 border border-[#07b9d5]/30">
                 <Bookmark size={32} className="text-[#07b9d5]" />
               </div>
               <h3 className="text-2xl font-bold text-white mb-3">No Bookmarks Yet</h3>
@@ -152,7 +152,7 @@ export default function BookmarksPage() {
               </p>
               <Link
                 href="/search"
-                className="px-6 py-3 bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-black text-sm font-bold rounded-lg hover:shadow-lg hover:shadow-[#07b9d5]/50 transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-linear-to-r from-[#07b9d5] to-[#059ab3] text-black text-sm font-bold rounded-lg hover:shadow-lg hover:shadow-[#07b9d5]/50 transition-all flex items-center gap-2"
               >
                 <Sparkles size={18} />
                 Search Solutions
@@ -204,7 +204,7 @@ export default function BookmarksPage() {
                           <code>{solution.code.substring(0, 300)}{solution.code.length > 300 ? '...' : ''}</code>
                         </pre>
                         {solution.code.length > 300 && (
-                          <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                          <div className="absolute bottom-0 left-0 w-full h-8 bg-linear-to-t from-black/60 to-transparent pointer-events-none"></div>
                         )}
                       </div>
                     )}

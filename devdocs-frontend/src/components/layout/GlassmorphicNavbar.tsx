@@ -80,27 +80,27 @@ export default function GlassmorphicNavbar() {
               {/* ─── LEFT: Logo (flex-shrink-0 so it never compresses) ─── */}
               <button
                 onClick={() => navigateTo('/')}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity flex-shrink-0 focus:outline-none cursor-pointer rounded-lg"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity shrink-0 focus:outline-none cursor-pointer rounded-lg"
                 aria-label="DevDocs home"
               >
                 <div className="relative group">
-                  <div className="w-10 h-10 bg-gradient-to-br from-[#07b9d5] to-[#059ab3] rounded-lg flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-[#07b9d5]/50 group-hover:shadow-[#07b9d5]/80 transition-all duration-300 group-hover:scale-110">
+                  <div className="w-10 h-10 bg-linear-to-br from-[#07b9d5] to-[#059ab3] rounded-lg flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-[#07b9d5]/50 group-hover:shadow-[#07b9d5]/80 transition-all duration-300 group-hover:scale-110">
                     D
                   </div>
                   <div className="absolute inset-0 bg-[#07b9d5] rounded-lg blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
                 </div>
-                <span className="text-white font-semibold text-lg tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                <span className="text-white font-semibold text-lg tracking-tight bg-linear-to-r from-white to-white/70 bg-clip-text text-transparent">
                   DevDocs
                 </span>
               </button>
 
               {/* ─── RIGHT: Actions (flex-shrink-0 so they never compress) ─── */}
-              <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-3 shrink-0">
 
                 {/* New Solution CTA */}
                 <button
                   onClick={() => navigateTo('/solution/create')}
-                  className="flex items-center gap-2 bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-black px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-[#07b9d5]/50 transition-all duration-300 hover:scale-105 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-[#07b9d5] focus:ring-offset-2 focus:ring-offset-black"
+                  className="flex items-center gap-2 bg-linear-to-r from-[#07b9d5] to-[#059ab3] text-black px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-[#07b9d5]/50 transition-all duration-300 hover:scale-105 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-[#07b9d5] focus:ring-offset-2 focus:ring-offset-black"
                   aria-label="Create new solution"
                 >
                   <Plus size={18} />
@@ -110,7 +110,7 @@ export default function GlassmorphicNavbar() {
                 {/* Profile Icon - Direct Navigation */}
                 <button
                   onClick={() => navigateTo('/profile')}
-                  className="w-10 h-10 bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-full flex items-center justify-center hover:border-[#07b9d5]/50 hover:shadow-lg hover:shadow-[#07b9d5]/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#07b9d5] focus:ring-offset-2 focus:ring-offset-black"
+                  className="w-10 h-10 bg-linear-to-br from-white/10 to-white/5 border border-white/20 rounded-full flex items-center justify-center hover:border-[#07b9d5]/50 hover:shadow-lg hover:shadow-[#07b9d5]/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#07b9d5] focus:ring-offset-2 focus:ring-offset-black"
                   aria-label="Go to profile"
                 >
                   <User size={18} className="text-white" />
@@ -213,7 +213,7 @@ function GlassMobileNavLink({ icon, label, active, badge, primary, onClick }: Gl
       {icon}
       <span className="flex-1 text-left">{label}</span>
       {badge && (
-        <span className="bg-gradient-to-r from-[#07b9d5] to-[#059ab3] text-black text-[10px] font-bold px-2 py-1 rounded-md shadow-lg shadow-[#07b9d5]/50">
+        <span className="bg-linear-to-r from-[#07b9d5] to-[#059ab3] text-black text-[10px] font-bold px-2 py-1 rounded-md shadow-lg shadow-[#07b9d5]/50">
           {badge}
         </span>
       )}
