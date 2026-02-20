@@ -190,11 +190,14 @@ export interface DashboardStats {
   /** Number of unique programming languages */
   total_languages: number;
   
-  /** Total number of searches performed */
-  total_searches: number;
+  /** Total unique tags across all solutions */
+  unique_tags: number;
   
-  /** Average similarity score across all searches */
-  average_similarity: number;
+  /** ISO timestamp of most recently created solution */
+  most_recent_solution: string | null;
+  
+  /** Breakdown of solution counts per language */
+  language_breakdown: Array<{ language: string; count: number }>;
 }
 
 // ============================================================================

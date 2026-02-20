@@ -44,13 +44,13 @@ async def create_solution(
         # Get or auto-create user
         user = await get_or_create_user(current_user, db)
         
-        # Generate embedding from title + description + code
+        # Generate embedding from title + description + code (async — does not block event loop)
         solution_text = embedding_service.create_solution_text(
             solution_data.title,
             solution_data.description,
             solution_data.code
         )
-        embedding = embedding_service.generate_embedding(solution_text)
+        embedding = await embedding_service.generate_embedding_async(solution_text)
         
         # Create new solution with user_id
         new_solution = Solution(
@@ -300,7 +300,7 @@ async def update_solution(
                 str(solution.description),  # type: ignore
                 str(solution.code)  # type: ignore
             )
-            new_embedding = embedding_service.generate_embedding(solution_text)
+            new_embedding = await embedding_service.generate_embedding_async(solution_text)
             if new_embedding:
                 solution.embedding = new_embedding  # type: ignore
         

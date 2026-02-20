@@ -51,8 +51,8 @@ async def semantic_search(
         # Get or auto-create user
         user = await get_or_create_user(current_user, db)
         
-        # Generate embedding for search query
-        query_embedding = embedding_service.generate_embedding(search_request.query)
+        # Generate embedding for search query (async — does not block event loop)
+        query_embedding = await embedding_service.generate_embedding_async(search_request.query)
         
         if query_embedding is None:
             raise HTTPException(

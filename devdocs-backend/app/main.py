@@ -10,6 +10,8 @@ from slowapi.util import get_remote_address  # type: ignore
 from slowapi.errors import RateLimitExceeded  # type: ignore
 from starlette.middleware.base import BaseHTTPMiddleware
 
+import torch
+
 from app.config import settings
 from app.routers import solutions, search, dashboard, auth, bookmarks
 from app.models.embedding import EmbeddingService
@@ -53,7 +55,20 @@ async def lifespan(app: FastAPI):
     Manage application lifespan - load ML models on startup, cleanup on shutdown
     """
     logger.info("🚀 Starting DevDocs Backend...")
-    
+
+    # ── PyTorch CPU thread tuning ───────────────────────────────────────────
+    # Pin intra-op threads to physical core count (avoids over-spawning on
+    # hyperthreaded CPUs which causes context-switch overhead during inference).
+    torch.set_num_threads(4)
+    torch.set_num_interop_threads(2)
+    torch.backends.mkldnn.enabled = True  # type: ignore
+    try:
+        torch.set_float32_matmul_precision("high")
+    except AttributeError:
+        pass  # older torch versions don't have this
+    logger.info("🧵 PyTorch CPU threads tuned: intra=4, interop=2, mkldnn=True")
+    # ────────────────────────────────────────────────────────────────────────
+
     # Validate required secrets
     logger.info("🔐 Validating required configuration...")
     if not settings.SUPABASE_URL or settings.SUPABASE_URL == "":

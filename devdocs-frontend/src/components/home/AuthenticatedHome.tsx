@@ -16,19 +16,11 @@ export default function AuthenticatedHome() {
     console.log('Dashboard data:', { stats, recentSolutions, weeklyActivity, isLoading });
   }, [stats, recentSolutions, weeklyActivity, isLoading]);
 
-  // Calculate language distribution from recent solutions
+  // Use language_breakdown from stats (covers ALL solutions, not just recent)
   const languageDistribution = React.useMemo(() => {
-    if (!recentSolutions || !Array.isArray(recentSolutions)) return [];
-    
-    const langCounts: Record<string, number> = {};
-    recentSolutions.forEach((solution) => {
-      langCounts[solution.language] = (langCounts[solution.language] || 0) + 1;
-    });
-    
-    return Object.entries(langCounts)
-      .map(([language, count]) => ({ language, count }))
-      .sort((a, b) => b.count - a.count);
-  }, [recentSolutions]);
+    if (!stats?.language_breakdown || !Array.isArray(stats.language_breakdown)) return [];
+    return stats.language_breakdown;
+  }, [stats?.language_breakdown]);
 
   return (
     <AuthenticatedLayout>
@@ -145,7 +137,7 @@ export default function AuthenticatedHome() {
                   <div className="shrink-0 flex items-center justify-center lg:items-start">
                     <svg width="180" height="180" viewBox="0 0 200 200" className="transform -rotate-90">
                       {(() => {
-                        const total = stats?.total_solutions || 1;
+                        const total = languageDistribution.reduce((sum: number, l: any) => sum + l.count, 0) || 1;
                         let currentAngle = 0;
                         const colors = [
                           '#07b9d5', '#06a5bf', '#0e7490', '#0c6682', 

@@ -24,7 +24,7 @@ DATABASE_URL = settings.DATABASE_URL.replace(
 
 engine = create_async_engine(
     DATABASE_URL,
-    echo=settings.ENVIRONMENT == "development",  # Log SQL queries in dev mode
+    echo=False,  # Never echo SQL — avoids stdout I/O latency and jitter in all environments
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
     pool_timeout=settings.DATABASE_POOL_TIMEOUT,

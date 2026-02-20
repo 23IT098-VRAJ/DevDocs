@@ -63,8 +63,7 @@ export default function SignUpPage() {
       {/* Animated background with grid */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_110%)]"></div>
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+
         
         {/* Floating code snippets */}
         <div className="absolute top-24 right-10 text-cyan-500/20 font-mono text-sm animate-float">class User {'{}'}</div>
@@ -78,7 +77,7 @@ export default function SignUpPage() {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white mb-3 relative inline-block">
             Join DevDocs
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-lg -z-10"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#07b9d5]/25 to-[#059ab3]/15 blur-lg -z-10"></div>
           </h2>
           <p className="text-gray-400 text-sm">Start organizing your code solutions today</p>
         </div>
@@ -86,7 +85,7 @@ export default function SignUpPage() {
         {/* Sign Up Form with pure black background */}
         <div className="bg-black backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-cyan-500/30 p-8 relative overflow-hidden">
           {/* Inner glow */}
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-[#07b9d5]/5 via-transparent to-[#07b9d5]/3 pointer-events-none"></div>
           <div className="absolute -top-24 -left-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl"></div>
           <form onSubmit={handleSubmit} className="space-y-4 relative">
             {/* Error Message */}
@@ -209,10 +208,10 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group mt-6"
+              className="w-full py-4 px-4 bg-gradient-to-r from-[#07b9d5] to-[#059ab3] hover:from-[#059ab3] hover:to-[#07b9d5] text-black font-bold rounded-xl shadow-lg shadow-[#07b9d5]/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group mt-6"
               suppressHydrationWarning
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity"></div>
+              <div className="absolute inset-0 bg-[#07b9d5] opacity-0 group-hover:opacity-20 transition-opacity"></div>
               {loading ? (
                 <span className="flex items-center justify-center">
                   <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
@@ -251,33 +250,6 @@ export default function SignUpPage() {
           </div>
         </div>
 
-        {/* Benefits */}
-        <div className="mt-8 space-y-3">
-          <div className="flex items-center gap-3 text-sm text-gray-400">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-              <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <span>Instant semantic search across all your code</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm text-gray-400">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-              <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <span>Secure cloud storage with encryption</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm text-gray-400">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-              <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-              </svg>
-            </div>
-            <span>AI-powered code organization</span>
-          </div>
-        </div>
       </div>
     </div>
   );

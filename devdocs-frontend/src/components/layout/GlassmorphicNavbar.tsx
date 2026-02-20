@@ -97,6 +97,33 @@ export default function GlassmorphicNavbar() {
               {/* ─── RIGHT: Actions (flex-shrink-0 so they never compress) ─── */}
               <div className="flex items-center gap-3 shrink-0">
 
+                {/* AI Search — main feature shortcut */}
+                <button
+                  onClick={() => navigateTo('/search')}
+                  className={`relative flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07b9d5] focus-visible:ring-offset-2 focus-visible:ring-offset-black hover:scale-105 active:scale-100 ${
+                    pathname === '/search'
+                      ? 'bg-transparent border-[#07b9d5]/30'
+                      : 'bg-transparent border-transparent hover:border-[#07b9d5]/20'
+                  }`}
+                  aria-label="AI Search"
+                >
+                  <Search
+                    size={16}
+                    className="text-[#07b9d5] shrink-0"
+                    style={{ filter: 'drop-shadow(0 0 6px #07b9d5)' }}
+                  />
+                  <span
+                    className="text-sm font-semibold whitespace-nowrap text-[#07b9d5]"
+                    style={{ textShadow: '0 0 10px rgba(7,185,213,0.7)' }}
+                  >
+                    Search
+                  </span>
+                  {/* AI badge */}
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-linear-to-r from-[#07b9d5] to-[#059ab3] text-black leading-none shrink-0 shadow-lg shadow-[#07b9d5]/50">
+                    AI
+                  </span>
+                </button>
+
                 {/* New Solution CTA */}
                 <button
                   onClick={() => navigateTo('/solution/create')}

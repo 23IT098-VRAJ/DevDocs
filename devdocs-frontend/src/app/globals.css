@@ -2,7 +2,11 @@
 
 :root {
   /* Fonts */
-  --font-sans: 'Exo 2', sans-serif;
+  --font-display:  'Cabinet Grotesk', sans-serif;   /* Display / Hero h1 */
+  --font-heading:  'Manrope', sans-serif;            /* Headings, UI, Nav, Buttons (overridden by next/font var) */
+  --font-body:     'Plus Jakarta Sans', sans-serif;  /* Body, paragraphs, captions (overridden by next/font var) */
+  --font-mono:     'Cascadia Code', 'Fira Code', 'Consolas', monospace; /* Code blocks */
+  --font-sans:     var(--font-body); /* legacy alias */
   
   /* Navbar Responsive Scaling */
   --navbar-scale: 1;
@@ -101,14 +105,14 @@
   }
 }
 
-/* Apply Exo 2 font globally */
+/* Apply base fonts globally — cascades to every component without touching them */
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
 }
 
-/* Ensure sans utility uses Exo 2 */
+/* Ensure sans utility uses body font */
 .font-sans {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
 }
 
 @media (max-width: 640px) {
@@ -120,8 +124,37 @@ body {
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Exo 2', sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans:    var(--font-body);
+  --font-mono:    var(--font-mono);
+}
+
+/* ── Global Typography Cascade ───────────────────────────────────────────────
+   Set once here; every component inherits automatically.
+   Role mapping:
+     Display  → Cabinet Grotesk  — h1, hero text
+     Heading  → Manrope          — h2–h6, subheadings
+     UI       → Manrope          — buttons, nav, labels, inputs
+     Body     → Plus Jakarta Sans — p, li, spans, descriptions
+     Caption  → Plus Jakarta Sans — small, time, meta labels (inherits body)
+     Code     → Cascadia Code    — code, pre, kbd
+────────────────────────────────────────────────────────────────────────── */
+h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+button, input, textarea, select, label,
+nav, [role="tab"], [role="button"] {
+  font-family: var(--font-heading);
+}
+
+code, pre, kbd, samp, .font-mono {
+  font-family: var(--font-mono) !important;
+  font-variant-ligatures: contextual;
 }
 
 body {
