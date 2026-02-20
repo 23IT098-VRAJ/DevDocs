@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search as SearchIcon, Code2, Tag, Calendar, TrendingUp, Sparkles, Copy, Bookmark, BookmarkCheck, ChevronRight, Home, Check } from 'lucide-react';
+import { Search as SearchIcon, Code2, Tag, Calendar, TrendingUp, Sparkles, Copy, Bookmark, BookmarkCheck, ChevronRight, Home, Check, Bot, ChevronDown, Loader2 } from 'lucide-react';
 import GlassmorphicNavbar from '@/components/layout/GlassmorphicNavbar';
 import { GlassmorphicFooter } from '@/components/layout/GlassmorphicFooter';
 import { useSearch } from '@/hooks/useSearch';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { bookmarksApi } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 export default function SearchPage() {
   const { loading } = useRequireAuth();
@@ -18,6 +19,9 @@ export default function SearchPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarkedSolutions, setBookmarkedSolutions] = useState<Set<string>>(new Set());
   const [bookmarkingId, setBookmarkingId] = useState<string | null>(null);
+  const [aiAnswer, setAiAnswer] = useState<string>('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showAiAnswer, setShowAiAnswer] = useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Debounce search query
@@ -54,6 +58,44 @@ export default function SearchPage() {
       setBookmarkedSolutions(bookmarked);
     }
   }, [searchResults]);
+
+  // Reset AI answer when query changes
+  useEffect(() => {
+    setAiAnswer('');
+    setShowAiAnswer(false);
+  }, [debouncedQuery]);
+
+  // Stream AI answer from backend
+  const fetchAiAnswer = async () => {
+    if (!debouncedQuery.trim() || aiLoading) return;
+    setAiLoading(true);
+    setAiAnswer('');
+    setShowAiAnswer(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/api/search/answer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ query: debouncedQuery, limit: 5, min_similarity: 0.3 }),
+      });
+      if (!res.ok || !res.body) throw new Error('Stream failed');
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        setAiAnswer(prev => prev + decoder.decode(value, { stream: true }));
+      }
+    } catch (err) {
+      setAiAnswer('_AI answer unavailable. Make sure the backend is running with a valid GEMINI_API_KEY._');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   // Copy to clipboard handler with fallback
   const handleCopy = async (code: string, solutionId: string) => {
@@ -267,9 +309,43 @@ export default function SearchPage() {
             {debouncedQuery && (
               <div className="flex items-center justify-between pb-4 border-b border-white/20 mb-6">
                 <h3 className="text-white font-bold text-lg">Top Results</h3>
-                <span className="text-white/40 text-sm">
-                  {isSearching ? 'Searching...' : `Found ${filteredResults.length} matches`}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-white/40 text-sm">
+                    {isSearching ? 'Searching...' : `Found ${filteredResults.length} matches`}
+                  </span>
+                  {filteredResults.length > 0 && (
+                    <button
+                      onClick={fetchAiAnswer}
+                      disabled={aiLoading}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-[#07b9d5]/20 to-[#059ab3]/10 border border-[#07b9d5]/40 text-[#07b9d5] text-sm font-semibold hover:border-[#07b9d5]/70 hover:shadow-lg hover:shadow-[#07b9d5]/20 transition-all disabled:opacity-60"
+                    >
+                      {aiLoading ? <Loader2 size={15} className="animate-spin" /> : <Bot size={15} />}
+                      {aiLoading ? 'Thinking...' : 'Ask AI'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* AI Answer Panel */}
+            {showAiAnswer && (
+              <div className="mb-8 rounded-2xl border border-[#07b9d5]/30 bg-black overflow-hidden">
+                <div
+                  className="flex items-center justify-between px-5 py-3 border-b border-[#07b9d5]/20 cursor-pointer hover:bg-white/5 transition-colors"
+                  onClick={() => setShowAiAnswer(v => !v)}
+                >
+                  <div className="flex items-center gap-2">
+                    <Bot size={18} className="text-[#07b9d5]" style={{ filter: 'drop-shadow(0 0 6px #07b9d5)' }} />
+                    <span className="text-white font-bold text-sm">AI Answer</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-linear-to-r from-[#07b9d5] to-[#059ab3] text-black">Gemini 2.0</span>
+                  </div>
+                  {aiLoading && <Loader2 size={14} className="text-[#07b9d5] animate-spin" />}
+                </div>
+                {showAiAnswer && (
+                  <div className="px-5 py-4 text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
+                    {aiAnswer || <span className="text-white/40 italic">Generating answer...</span>}
+                  </div>
+                )}
               </div>
             )}
 

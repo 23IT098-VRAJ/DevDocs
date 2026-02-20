@@ -11,6 +11,7 @@ import { Input, Textarea, Button, Badge, CodePreview } from '@/components/ui';
 import { useCreateSolution, useUpdateSolution } from '@/hooks';
 import { LANGUAGES, VALIDATION } from '@/lib/constants';
 import { triggerRealisticConfetti } from '@/lib/confetti';
+import { supabase } from '@/lib/supabase';
 import type { Solution, SolutionCreate, SolutionUpdate } from '@/lib/types';
 
 // ============================================================================
@@ -86,6 +87,40 @@ export function SolutionForm({
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [suggestingTags, setSuggestingTags] = useState(false);
+
+  // AI tag suggestion
+  const handleSuggestTags = async () => {
+    if (suggestingTags) return;
+    setSuggestingTags(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/api/solutions/suggest-tags`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          code: formData.code,
+        }),
+      });
+      if (!res.ok) throw new Error('Request failed');
+      const data = await res.json();
+      if (Array.isArray(data.tags) && data.tags.length > 0) {
+        const existing = formData.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+        const merged = Array.from(new Set([...existing, ...data.tags])).join(', ');
+        setFormData(prev => ({ ...prev, tags: merged }));
+      }
+    } catch (err) {
+      console.error('Tag suggestion failed:', err);
+    } finally {
+      setSuggestingTags(false);
+    }
+  };
 
   // Notify parent when submitting state changes
   useEffect(() => {
@@ -358,9 +393,30 @@ export function SolutionForm({
 
       {/* Tags Input with Chips */}
       <div className="flex flex-col gap-2">
-        <label className="text-white text-base font-medium">
-          Tags <span className="text-red-500">*</span>
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="text-white text-base font-medium">
+            Tags <span className="text-red-500">*</span>
+          </label>
+          <button
+            type="button"
+            onClick={handleSuggestTags}
+            disabled={suggestingTags || !formData.title}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold text-[#07b9d5] border border-[#07b9d5]/30 hover:border-[#07b9d5]/60 hover:bg-[#07b9d5]/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            title={!formData.title ? 'Add a title first' : 'Suggest tags with AI'}
+          >
+            {suggestingTags ? (
+              <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : (
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            )}
+            {suggestingTags ? 'Suggesting...' : 'AI Suggest'}
+          </button>
+        </div>
         <div className="w-full rounded-lg border border-white/20 bg-black focus-within:border-[#07b9d5] focus-within:ring-1 focus-within:ring-[#07b9d5] min-h-[3rem] px-2 py-1.5 flex flex-wrap items-center gap-2 transition-all cursor-text">
           {/* Tag Chips */}
           {formData.tags

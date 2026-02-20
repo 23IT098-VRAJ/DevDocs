@@ -24,6 +24,12 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 slowapi==0.1.9
 
+# AI Answer Generation + Smart Tagging (Gemini 2.0 Flash)
+google-genai>=1.0.0
+
+# Redis embedding cache
+redis>=5.0.0
+
 # Utilities
 python-dotenv==1.0.0
 httpx==0.26.0

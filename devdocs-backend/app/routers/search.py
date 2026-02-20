@@ -2,6 +2,7 @@
 DevDocs Backend - Semantic Search Router
 """
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text, select, and_
 from sqlalchemy.exc import OperationalError, DBAPIError
@@ -153,6 +154,78 @@ async def semantic_search(
     except Exception as e:
         logger.error(f"Unexpected search error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail="Search failed")
+
+
+# ============================================================================
+# POST /api/search/answer  —  AI answer synthesis (streaming)
+# ============================================================================
+
+@router.post("/search/answer")
+async def ai_answer(
+    search_request: SearchRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+):
+    """
+    Stream a Gemini-generated answer synthesised from the user's top semantic
+    search results.  Response is plain text streamed token-by-token.
+    """
+    from app.services import gemini
+
+    if not gemini.is_available():
+        raise HTTPException(
+            status_code=503,
+            detail="AI answers unavailable — GEMINI_API_KEY not configured",
+        )
+
+    user = await get_or_create_user(current_user, db)
+
+    # Reuse the same vector search as /api/search
+    query_embedding = await embedding_service.generate_embedding_async(search_request.query)
+    if query_embedding is None:
+        raise HTTPException(status_code=503, detail="Embedding model not available")
+
+    embedding_str = "[" + ",".join(map(str, query_embedding)) + "]"
+
+    similarity_query = text("""
+        SELECT title, description, code, language, tags
+        FROM solutions
+        WHERE is_archived = FALSE
+          AND user_id = :user_id
+          AND embedding IS NOT NULL
+          AND (1 - (embedding <=> CAST(:query_embedding AS vector))) >= :min_similarity
+        ORDER BY embedding <=> CAST(:query_embedding AS vector)
+        LIMIT 5
+    """)
+
+    result = await db.execute(
+        similarity_query,
+        {
+            "query_embedding": embedding_str,
+            "user_id": str(user.id),
+            "min_similarity": search_request.min_similarity,
+        },
+    )
+    rows = result.fetchall()
+
+    results = [
+        {
+            "solution": {
+                "title": r.title,
+                "description": r.description,
+                "code": r.code,
+                "language": r.language,
+                "tags": r.tags or [],
+            }
+        }
+        for r in rows
+    ]
+
+    async def stream():
+        async for chunk in gemini.generate_answer_stream(search_request.query, results):
+            yield chunk
+
+    return StreamingResponse(stream(), media_type="text/plain; charset=utf-8")
 
 
 # ============================================================================
