@@ -38,6 +38,10 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Setup / verify scripts
+verify_setup.js
+setup_*.js
+
 # vercel
 .vercel
 

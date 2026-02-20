@@ -1,5 +1,8 @@
 # Python virtual environment
 venv/
+.venv/
+.venv*/
+env/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -7,6 +10,7 @@ __pycache__/
 # Environment variables
 .env
 .env.local
+.env.production
 
 # IDE
 .vscode/
@@ -14,10 +18,18 @@ __pycache__/
 *.swp
 *.swo
 
-# Testing
+# Testing & verification
 .pytest_cache/
 .coverage
 htmlcov/
+verify_setup.py
+
+# Ruff linter cache
+.ruff_cache/
+
+# Utility / run scripts (not core application code)
+run.py
+setup_*.py
 
 # Model cache (sentence-transformers downloads models here)
 models/

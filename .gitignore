@@ -18,6 +18,7 @@ venv/
 env/
 ENV/
 .venv/
+.venv*/
 pip-log.txt
 pip-delete-this-directory.txt
 .pytest_cache/
@@ -25,6 +26,16 @@ pip-delete-this-directory.txt
 htmlcov/
 *.cover
 .hypothesis/
+
+# Ruff linter cache
+.ruff_cache/
+
+# Utility / run / setup / verify scripts
+run.py
+verify_setup.py
+verify_setup.js
+setup_bookmarks.py
+setup_*.py
 
 # Node.js
 node_modules/
