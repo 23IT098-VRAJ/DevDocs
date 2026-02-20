@@ -6,7 +6,7 @@
 'use client';
 
 import { use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useSolution, useDeleteSolution } from '@/hooks/useSolutions';
 import { Button, Card, Badge, Spinner } from '@/components/ui';
@@ -24,6 +24,9 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
   const { id } = use(params);
   const { loading: authLoading } = useRequireAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromSearch = searchParams.get('from') === 'search';
+  const searchQuery = searchParams.get('q') || '';
   const { data: solution, isLoading, error } = useSolution(id);
   const deleteMutation = useDeleteSolution();
   const [copied, setCopied] = useState(false);
@@ -179,9 +182,18 @@ export default function SolutionDetailPage({ params }: SolutionDetailPageProps) 
             Home
           </Link>
           <ChevronRight size={14} className="text-white/40" />
-          <Link href="/solution" className="text-white/60 hover:text-white transition-colors">
-            Solutions
-          </Link>
+          {fromSearch ? (
+            <Link
+              href={searchQuery ? `/search?q=${encodeURIComponent(searchQuery)}` : '/search'}
+              className="text-white/60 hover:text-white transition-colors"
+            >
+              Search{searchQuery ? ` "${searchQuery}"` : ''}
+            </Link>
+          ) : (
+            <Link href="/solution" className="text-white/60 hover:text-white transition-colors">
+              Solutions
+            </Link>
+          )}
           <ChevronRight size={14} className="text-white/40" />
           <span className="text-[#07b9d5] truncate max-w-75">{solution.title}</span>
         </div>

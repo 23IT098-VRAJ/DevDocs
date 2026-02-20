@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search as SearchIcon, Code2, Tag, Calendar, TrendingUp, Sparkles, Copy, Bookmark, BookmarkCheck, ChevronRight, Home, Check, Bot, ChevronDown, Loader2 } from 'lucide-react';
 import GlassmorphicNavbar from '@/components/layout/GlassmorphicNavbar';
 import { GlassmorphicFooter } from '@/components/layout/GlassmorphicFooter';
@@ -11,11 +12,14 @@ import { bookmarksApi } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
 export default function SearchPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { loading } = useRequireAuth();
-  const [query, setQuery] = useState('');
+  const initialQ = searchParams.get('q') || '';
+  const [query, setQuery] = useState(initialQ);
   const [language, setLanguage] = useState('');
   const [framework, setFramework] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQ);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarkedSolutions, setBookmarkedSolutions] = useState<Set<string>>(new Set());
   const [bookmarkingId, setBookmarkingId] = useState<string | null>(null);
@@ -23,6 +27,7 @@ export default function SearchPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [showAiAnswer, setShowAiAnswer] = useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const firstSyncRef = useRef(true); // skip URL write on first render
 
   // Debounce search query
   useEffect(() => {
@@ -32,6 +37,13 @@ export default function SearchPage() {
 
     return () => clearTimeout(timer);
   }, [query]);
+
+  // Sync debounced query to URL (skip first render to avoid wiping restored param)
+  useEffect(() => {
+    if (firstSyncRef.current) { firstSyncRef.current = false; return; }
+    const url = debouncedQuery.trim() ? `/search?q=${encodeURIComponent(debouncedQuery.trim())}` : '/search';
+    router.replace(url, { scroll: false });
+  }, [debouncedQuery]);
 
   // Focus input on mount (client-side only)
   useEffect(() => {
@@ -410,6 +422,7 @@ export default function SearchPage() {
                   <article
                     key={result.solution.id}
                     className="group relative backdrop-blur-2xl bg-black border border-[#07b9d5]/20 rounded-2xl p-6 hover:border-[#07b9d5]/40 hover:shadow-xl hover:shadow-[#07b9d5]/10 transition-all duration-300 cursor-pointer"
+                    onClick={() => router.push(`/solution/${result.solution.id}?from=search&q=${encodeURIComponent(debouncedQuery)}`)}
                   >
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">

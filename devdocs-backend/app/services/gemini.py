@@ -1,9 +1,8 @@
 """
-Gemini AI Service — uses the current google-genai SDK (v1.x)
+Gemini AI Service - uses the current google-genai SDK (v1.x)
 
-Provides two features:
-  1. suggest_tags()           — Auto-tag a solution with 3-6 relevant tags
-  2. generate_answer_stream() — Stream an AI answer synthesised from search results
+Provides:
+  generate_answer_stream() - Stream an AI answer synthesised from search results
 """
 import json
 import re
@@ -21,7 +20,7 @@ def init_gemini() -> None:
     """Configure Gemini client. Called once at startup."""
     global _client
     if not settings.GEMINI_API_KEY:
-        logger.warning("⚠️  GEMINI_API_KEY not set — AI tagging and answer features disabled")
+        logger.warning("GEMINI_API_KEY not set - AI answer feature disabled")
         return
     try:
         from google import genai  # type: ignore
@@ -40,64 +39,7 @@ _MODEL = "gemini-2.0-flash"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Feature 1 — Smart Tag Suggestions
-# ─────────────────────────────────────────────────────────────────────────────
-
-async def suggest_tags(
-    title: str,
-    description: str,
-    code: str,
-    existing_user_tags: List[str],
-) -> List[str]:
-    """
-    Ask Gemini to suggest 3-6 relevant tags for a code solution.
-
-    existing_user_tags — tags already used in the user's library, so suggestions
-    are consistent with their existing taxonomy.
-    """
-    if _client is None:
-        return []
-
-    code_preview = code[:800] if code else ""
-    existing = ", ".join(existing_user_tags[:40]) if existing_user_tags else "none"
-
-    prompt = f"""You are a code tagging assistant for a developer's personal knowledge base.
-Suggest 3-6 concise, lowercase tags for the solution below.
-
-Rules:
-- Tags must be short (1-3 words), lowercase, hyphenated if multi-word
-- Prefer specific over generic (e.g. "react-hooks" not "react")
-- Reuse existing tags from the user's library when relevant
-- Cover: language/framework, concept, pattern, and use-case where possible
-
-Title: {title}
-Description: {description}
-Code (first 800 chars):
-{code_preview}
-
-User's existing tags (prefer these when relevant): {existing}
-
-Reply with ONLY a valid JSON array of strings, nothing else.
-Example: ["async-await", "error-handling", "python", "decorator"]"""
-
-    try:
-        response = await _client.aio.models.generate_content(  # type: ignore
-            model=_MODEL,
-            contents=prompt,
-        )
-        raw = response.text.strip()
-        # Strip markdown code fences if present
-        raw = re.sub(r"^```[a-z]*\n?", "", raw)
-        raw = re.sub(r"\n?```$", "", raw)
-        tags = json.loads(raw.strip())
-        return [str(t).lower().strip() for t in tags if t][:8]
-    except Exception as e:
-        logger.error(f"Tag suggestion failed: {e}")
-        return []
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Feature 2 — AI Answer (Streaming)
+# AI Answer (Streaming)
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def generate_answer_stream(
@@ -106,7 +48,7 @@ async def generate_answer_stream(
 ) -> AsyncIterator[str]:
     """
     Stream a synthesised AI answer from the top semantic search results.
-    Each yielded string is a text chunk — send directly as SSE / plain stream.
+    Each yielded string is a text chunk - send directly as SSE / plain stream.
     """
     if _client is None:
         yield "_AI answers are unavailable (GEMINI_API_KEY not configured)._"
