@@ -1,0 +1,70 @@
+# Flutter build artifacts
+build/
+.dart_tool/
+.flutter-plugins-dependencies
+pubspec.lock
+
+# Android build
+android/.gradle/
+android/build/
+android/.idea/
+android/local.properties
+android*.iml
+*.apk
+*.aab
+
+# iOS build
+ios/Pods/
+ios/Podfile.lock
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+
+# Web build
+web/
+.web/
+
+# Python backend
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+pip-log.txt
+pip-delete-this-directory.txt
+.venv
+.env
+.env.local
+
+# IDE files (but keep .vscode for project launch configs)
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+.coverage
+lcov.info
+
+# Misc
+*.log
+.packages
+.metadata
+release_build/
+
+# Gradle
+.gradle/
+gradlew.bat
+gradlew
+gradle/

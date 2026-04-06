@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter: Phone Hotspot (local hostname)",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": [
+        "--dart-define",
+        "API_LOCAL_HOST=devdocs-server.local"
+      ]
+    },
+    {
+      "name": "Flutter: Phone Hotspot (set current laptop IP)",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": [
+        "--dart-define",
+        "API_LOCAL_HOST=192.168.137.1"
+      ]
+    },
+    {
+      "name": "Flutter: Full API URL override",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": [
+        "--dart-define",
+        "API_BASE_URL=http://192.168.137.1:8000/api"
+      ]
+    }
+  ]
+}
