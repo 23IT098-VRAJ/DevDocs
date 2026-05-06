@@ -31,9 +31,14 @@ verify_setup.py
 run.py
 setup_*.py
 
-# Model cache (sentence-transformers downloads models here)
-models/
+# Model cache (sentence-transformers downloads models here at root level)
+# NOTE: /models/ only ignores root-level cache, NOT app/models/ Python package
+/models/
 .cache/
+*.bin
+*.onnx
+*.pkl
+*.joblib
 
 # Database
 *.db
