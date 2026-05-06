@@ -53,7 +53,7 @@ export default function ProfilePage() {
 
   // Calculate activity stats
   const totalSolutions = stats?.total_solutions || 0;
-  const totalSearches = stats?.total_searches || 0;
+  const totalSearches = stats?.unique_tags || 0; // Using unique tags as a placeholder since total_searches isn't tracked
   const reputation = 850; // Placeholder - calculate from user activity
   const streak = 12; // Placeholder - calculate from consecutive days
 

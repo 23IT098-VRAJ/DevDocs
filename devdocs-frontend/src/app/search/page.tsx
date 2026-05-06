@@ -14,7 +14,7 @@ import { bookmarksApi } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 import { formatDateIST } from '@/lib/utils';
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { loading } = useRequireAuth();
@@ -33,38 +33,32 @@ export default function SearchPage() {
   const [expandedSolutionId, setExpandedSolutionId] = useState<string | null>(null);
   const [loadingExplanationId, setLoadingExplanationId] = useState<string | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const firstSyncRef = useRef(true); // skip URL write on first render
+  const firstSyncRef = useRef(true);
 
-  // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
     }, 500);
-
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Sync debounced query to URL (skip first render to avoid wiping restored param)
   useEffect(() => {
     if (firstSyncRef.current) { firstSyncRef.current = false; return; }
     const url = debouncedQuery.trim() ? `/search?q=${encodeURIComponent(debouncedQuery.trim())}` : '/search';
     router.replace(url, { scroll: false });
-  }, [debouncedQuery]);
+  }, [debouncedQuery, router]);
 
-  // Focus input on mount (client-side only)
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, []);
 
-  // Use the search hook with debounced query
   const { data: searchResults, isLoading: isSearching } = useSearch({
     query: debouncedQuery,
     limit: 20,
   });
 
-  // Initialize bookmarked solutions from search results
   useEffect(() => {
     if (searchResults) {
       const bookmarked = new Set<string>();
@@ -77,13 +71,11 @@ export default function SearchPage() {
     }
   }, [searchResults]);
 
-  // Reset AI answer when query changes
   useEffect(() => {
     setAiAnswer('');
     setShowAiAnswer(false);
   }, [debouncedQuery]);
 
-  // Stream AI answer from backend
   const fetchAiAnswer = async () => {
     if (!debouncedQuery.trim() || aiLoading) return;
     setAiLoading(true);
@@ -115,16 +107,13 @@ export default function SearchPage() {
     }
   };
 
-  // Copy to clipboard handler with fallback
   const handleCopy = async (code: string, solutionId: string) => {
     try {
-      // Try modern clipboard API first
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(code);
         setCopiedId(solutionId);
         setTimeout(() => setCopiedId(null), 2000);
       } else {
-        // Fallback for browsers that don't support clipboard API
         const textArea = document.createElement('textarea');
         textArea.value = code;
         textArea.style.position = 'fixed';
@@ -149,7 +138,6 @@ export default function SearchPage() {
     }
   };
 
-  // Bookmark toggle handler
   const handleBookmarkToggle = async (solutionId: string) => {
     try {
       setBookmarkingId(solutionId);
@@ -171,12 +159,10 @@ export default function SearchPage() {
     }
   };
 
-  // Ask AI about a specific solution
   const fetchSolutionExplanation = async (solutionId: string) => {
     try {
       setLoadingExplanationId(solutionId);
       
-      // Check if we already have this explanation cached
       if (solutionExplanations[solutionId]) {
         setExpandedSolutionId(expandedSolutionId === solutionId ? null : solutionId);
         setLoadingExplanationId(null);
@@ -206,7 +192,7 @@ export default function SearchPage() {
         explanation += decoder.decode(value, { stream: true });
       }
 
-      explanation += decoder.decode(); // Flush any remaining
+      explanation += decoder.decode();
 
       setSolutionExplanations(prev => ({
         ...prev,
@@ -261,7 +247,6 @@ export default function SearchPage() {
     <div className="min-h-screen bg-black">
       <GlassmorphicNavbar />
       <div className="pt-20 flex">
-        {/* Left Sidebar: Filters */}
         <aside className="w-80 border-r border-white/20 bg-black p-6 shrink-0 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto hidden lg:flex lg:flex-col lg:gap-6">
           <div>
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
@@ -269,7 +254,6 @@ export default function SearchPage() {
               Filters
             </h3>
             
-            {/* Language Filter */}
             <div className="mb-6">
               <label className="text-white/70 text-sm font-medium mb-3 block">Language</label>
               <select 
@@ -284,7 +268,6 @@ export default function SearchPage() {
               </select>
             </div>
 
-            {/* Framework Filter */}
             <div className="mb-6">
               <label className="text-white/70 text-sm font-medium mb-3 block">Framework</label>
               <input
@@ -296,7 +279,6 @@ export default function SearchPage() {
               />
             </div>
 
-            {/* Clear Filters */}
             {language && (
               <button
                 onClick={() => {
@@ -310,7 +292,6 @@ export default function SearchPage() {
             )}
           </div>
 
-          {/* Pro Tip Card */}
           <div className="mt-auto backdrop-blur-xl bg-linear-to-br from-[#07b9d5]/10 to-[#059ab3]/5 p-4 rounded-xl border border-[#07b9d5]/20">
             <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
               <Sparkles size={16} className="text-[#07b9d5]" />
@@ -322,9 +303,7 @@ export default function SearchPage() {
           </div>
         </aside>
 
-        {/* Main Content: Search & Results */}
         <main className="flex-1 p-6 lg:p-10 lg:pt-8 overflow-y-auto">
-          {/* Breadcrumbs */}
           <div className="flex items-center gap-2 mb-6 text-sm">
             <Link href="/" className="flex items-center gap-1 text-white/60 hover:text-white transition-colors">
               <Home size={16} />
@@ -334,7 +313,6 @@ export default function SearchPage() {
             <span className="text-[#07b9d5]">Search</span>
           </div>
 
-          {/* Hero Search Area */}
           <div className="w-full max-w-4xl mx-auto mb-10">
             <form onSubmit={handleSearch}>
               <div className="relative group">
@@ -362,7 +340,6 @@ export default function SearchPage() {
               </div>
             </form>
             
-            {/* Trending Tags */}
             <div className="flex items-center gap-3 mt-4 text-sm pl-2">
               <span className="text-white/40">Trending:</span>
               {['react-hooks', 'docker-compose', 'rust-async'].map((tag) => (
@@ -377,7 +354,6 @@ export default function SearchPage() {
             </div>
           </div>
 
-          {/* Results Section */}
           <div className="w-full max-w-4xl mx-auto">
             {debouncedQuery && (
               <div className="flex items-center justify-between pb-4 border-b border-white/20 mb-6">
@@ -400,7 +376,6 @@ export default function SearchPage() {
               </div>
             )}
 
-            {/* AI Answer Panel */}
             {showAiAnswer && (
               <div className="mb-8 rounded-2xl border border-[#07b9d5]/30 bg-black overflow-hidden">
                 <div
@@ -430,7 +405,6 @@ export default function SearchPage() {
               </div>
             )}
 
-            {/* Loading State */}
             {isSearching && (
               <div className="grid grid-cols-1 gap-6">
                 {[1, 2, 3].map((i) => (
@@ -447,7 +421,6 @@ export default function SearchPage() {
               </div>
             )}
 
-            {/* Empty State - No Query */}
             {!debouncedQuery && !isSearching && (
               <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-20 h-20 bg-linear-to-br from-[#07b9d5]/20 to-[#059ab3]/10 rounded-2xl flex items-center justify-center mb-6 border border-[#07b9d5]/30">
@@ -471,7 +444,6 @@ export default function SearchPage() {
               </div>
             )}
 
-            {/* Empty State - No Results */}
             {debouncedQuery && !isSearching && filteredResults.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center mb-6 border border-white/20">
@@ -484,7 +456,6 @@ export default function SearchPage() {
               </div>
             )}
 
-            {/* Search Results */}
             {!isSearching && filteredResults.length > 0 && (
               <div className="flex flex-col gap-6">
                 {filteredResults.map((result) => (
@@ -493,7 +464,6 @@ export default function SearchPage() {
                     className="group relative backdrop-blur-2xl bg-black border border-[#07b9d5]/20 rounded-2xl p-6 hover:border-[#07b9d5]/40 hover:shadow-xl hover:shadow-[#07b9d5]/10 transition-all duration-300 cursor-pointer"
                     onClick={() => router.push(`/solution/${result.solution.id}?from=search&q=${encodeURIComponent(debouncedQuery)}`)}
                   >
-                    {/* Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#07b9d5] transition-colors">
@@ -515,10 +485,8 @@ export default function SearchPage() {
                       )}
                     </div>
 
-                    {/* Code Preview */}
                     {result.solution.code && (
                       <div className="relative mb-4 bg-black border border-white/20 rounded-xl p-4 overflow-hidden">
-                        {/* Window Dots */}
                         <div className="absolute top-3 right-3 flex gap-1.5">
                           <div className="size-2.5 rounded-full bg-red-500/20"></div>
                           <div className="size-2.5 rounded-full bg-yellow-500/20"></div>
@@ -533,15 +501,12 @@ export default function SearchPage() {
                       </div>
                     )}
 
-                    {/* Footer */}
                     <div className="flex items-center gap-4 mt-4">
-                      {/* Language Badge */}
                       <div className="flex items-center gap-1.5 bg-black border border-white/20 px-3 py-1.5 rounded-lg">
                         <Code2 size={14} className="text-[#07b9d5]" />
                         <span className="text-white/70 text-xs font-medium">{result.solution.language}</span>
                       </div>
 
-                      {/* Tags */}
                       <div className="flex gap-2">
                         {result.solution.tags && result.solution.tags.slice(0, 3).map((tag: string) => (
                           <span key={tag} className="text-xs text-white/50 hover:text-[#07b9d5] transition-colors">
@@ -552,7 +517,6 @@ export default function SearchPage() {
 
                       <div className="flex-1"></div>
 
-                      {/* Action Buttons */}
                       <button 
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
@@ -607,14 +571,12 @@ export default function SearchPage() {
                         )}
                       </button>
 
-                      {/* Date */}
                       <div className="flex items-center gap-1.5 text-white/40 text-xs">
                         <Calendar size={14} />
                         <span>{formatDateIST(result.solution.created_at)}</span>
                       </div>
                     </div>
 
-                    {/* AI Explanation Section */}
                     {expandedSolutionId === result.solution.id && solutionExplanations[result.solution.id] && (
                       <div className="mt-4 pt-4 border-t border-[#07b9d5]/20">
                         <div className="bg-black/50 border border-[#07b9d5]/20 rounded-xl p-4">
@@ -633,7 +595,6 @@ export default function SearchPage() {
                   </article>
                 ))}
 
-                {/* Load More Button */}
                 {filteredResults.length >= 10 && (
                   <div className="mt-6 flex justify-center">
                     <button className="px-6 py-3 bg-black hover:bg-white/10 text-white text-sm font-bold rounded-lg transition-all flex items-center gap-2 border border-white/20 hover:border-[#07b9d5]/30">
@@ -650,5 +611,20 @@ export default function SearchPage() {
       
       <GlassmorphicFooter />
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <React.Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-400">Loading Search...</p>
+        </div>
+      </div>
+    }>
+      <SearchContent />
+    </React.Suspense>
   );
 }
