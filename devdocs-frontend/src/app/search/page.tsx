@@ -4,12 +4,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search as SearchIcon, Code2, Tag, Calendar, TrendingUp, Sparkles, Copy, Bookmark, BookmarkCheck, ChevronRight, Home, Check, Bot, ChevronDown, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import GlassmorphicNavbar from '@/components/layout/GlassmorphicNavbar';
 import { GlassmorphicFooter } from '@/components/layout/GlassmorphicFooter';
 import { useSearch } from '@/hooks/useSearch';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { bookmarksApi } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
+import { formatDateIST } from '@/lib/utils';
 
 export default function SearchPage() {
   const router = useRouter();
@@ -26,6 +29,9 @@ export default function SearchPage() {
   const [aiAnswer, setAiAnswer] = useState<string>('');
   const [aiLoading, setAiLoading] = useState(false);
   const [showAiAnswer, setShowAiAnswer] = useState(false);
+  const [solutionExplanations, setSolutionExplanations] = useState<Record<string, string>>({});
+  const [expandedSolutionId, setExpandedSolutionId] = useState<string | null>(null);
+  const [loadingExplanationId, setLoadingExplanationId] = useState<string | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const firstSyncRef = useRef(true); // skip URL write on first render
 
@@ -165,6 +171,59 @@ export default function SearchPage() {
     }
   };
 
+  // Ask AI about a specific solution
+  const fetchSolutionExplanation = async (solutionId: string) => {
+    try {
+      setLoadingExplanationId(solutionId);
+      
+      // Check if we already have this explanation cached
+      if (solutionExplanations[solutionId]) {
+        setExpandedSolutionId(expandedSolutionId === solutionId ? null : solutionId);
+        setLoadingExplanationId(null);
+        return;
+      }
+
+      const { data: { session } } = await supabase.auth.getSession();
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/api/search/explain-solution`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ solution_id: solutionId }),
+      });
+
+      if (!res.ok || !res.body) throw new Error('Explanation stream failed');
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let explanation = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        explanation += decoder.decode(value, { stream: true });
+      }
+
+      explanation += decoder.decode(); // Flush any remaining
+
+      setSolutionExplanations(prev => ({
+        ...prev,
+        [solutionId]: explanation,
+      }));
+      setExpandedSolutionId(solutionId);
+    } catch (err) {
+      console.error('Failed to fetch explanation:', err);
+      setSolutionExplanations(prev => ({
+        ...prev,
+        [solutionId]: 'Failed to generate explanation. Please try again.',
+      }));
+    } finally {
+      setLoadingExplanationId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -195,6 +254,8 @@ export default function SearchPage() {
       handleSearch(e as any);
     }
   };
+
+  const renderedAiAnswer = aiAnswer.replace(/==([^=]+)==/g, '**$1**');
 
   return (
     <div className="min-h-screen bg-black">
@@ -354,8 +415,16 @@ export default function SearchPage() {
                   {aiLoading && <Loader2 size={14} className="text-[#07b9d5] animate-spin" />}
                 </div>
                 {showAiAnswer && (
-                  <div className="px-5 py-4 text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
-                    {aiAnswer || <span className="text-white/40 italic">Generating answer...</span>}
+                  <div className="px-5 py-4 text-sm leading-relaxed">
+                    {aiAnswer ? (
+                      <div className="text-white/80 wrap-anywhere [&_p]:my-2 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-1 [&_h1]:text-base [&_h1]:font-bold [&_h1]:text-[#C4B5FD] [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-[#C4B5FD] [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-[#C4B5FD] [&_a]:text-[#C4B5FD] [&_a]:underline [&_strong]:font-semibold [&_strong]:text-[#C4B5FD] [&_em]:text-[#C4B5FD] [&_em]:not-italic [&_code]:rounded [&_code]:bg-[#07b9d5]/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-[#C4B5FD] [&_pre]:my-3 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:border [&_pre]:border-[#07b9d5]/30 [&_pre]:bg-black/80 [&_pre]:p-3 [&_blockquote]:my-3 [&_blockquote]:border-l-2 [&_blockquote]:border-[#07b9d5]/50 [&_blockquote]:pl-3 [&_blockquote]:text-white/70 [&_mark]:rounded [&_mark]:bg-[#07b9d5]/20 [&_mark]:px-1 [&_mark]:text-[#C4B5FD]">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {renderedAiAnswer}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <span className="text-white/40 italic">Generating answer...</span>
+                    )}
                   </div>
                 )}
               </div>
@@ -487,6 +556,22 @@ export default function SearchPage() {
                       <button 
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
+                          fetchSolutionExplanation(result.solution.id);
+                        }}
+                        disabled={loadingExplanationId === result.solution.id}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-linear-to-r from-[#07b9d5]/20 to-[#07b9d5]/10 border border-[#07b9d5]/40 text-[#07b9d5] text-xs font-semibold hover:border-[#07b9d5]/70 hover:shadow-lg hover:shadow-[#07b9d5]/20 transition-all disabled:opacity-60"
+                        title="Ask AI to explain this solution"
+                      >
+                        {loadingExplanationId === result.solution.id ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Bot size={13} />
+                        )}
+                        <span className="hidden sm:inline">Ask AI</span>
+                      </button>
+                      <button 
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
                           handleBookmarkToggle(result.solution.id);
                         }}
                         disabled={bookmarkingId === result.solution.id}
@@ -525,9 +610,26 @@ export default function SearchPage() {
                       {/* Date */}
                       <div className="flex items-center gap-1.5 text-white/40 text-xs">
                         <Calendar size={14} />
-                        <span>{new Date(result.solution.created_at).toLocaleDateString()}</span>
+                        <span>{formatDateIST(result.solution.created_at)}</span>
                       </div>
                     </div>
+
+                    {/* AI Explanation Section */}
+                    {expandedSolutionId === result.solution.id && solutionExplanations[result.solution.id] && (
+                      <div className="mt-4 pt-4 border-t border-[#07b9d5]/20">
+                        <div className="bg-black/50 border border-[#07b9d5]/20 rounded-xl p-4">
+                          <h5 className="text-[#07b9d5] font-bold text-sm mb-3 flex items-center gap-2">
+                            <Sparkles size={14} />
+                            How It Works
+                          </h5>
+                          <div className="text-white/80 text-sm leading-relaxed [&_p]:my-2 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-1 [&_strong]:font-semibold [&_strong]:text-[#C4B5FD] [&_em]:text-[#C4B5FD] [&_code]:rounded [&_code]:bg-[#07b9d5]/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-[#C4B5FD]">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {solutionExplanations[result.solution.id]}
+                            </ReactMarkdown>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </article>
                 ))}
 

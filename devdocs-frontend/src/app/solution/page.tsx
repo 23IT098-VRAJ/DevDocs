@@ -13,6 +13,7 @@ import GlassmorphicNavbar from '@/components/layout/GlassmorphicNavbar';
 import { GlassmorphicFooter } from '@/components/layout/GlassmorphicFooter';
 import { Solution } from '@/lib/types';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { formatDateIST } from '@/lib/utils';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -171,18 +172,6 @@ export default function SolutionsPage() {
     return colors[language.toLowerCase()] || 'slate-400';
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffInDays === 0) return 'Added today';
-    if (diffInDays === 1) return 'Added yesterday';
-    if (diffInDays < 7) return `Added ${diffInDays} days ago`;
-    if (diffInDays < 30) return `Added ${Math.floor(diffInDays / 7)} weeks ago`;
-    if (diffInDays < 365) return `Added ${Math.floor(diffInDays / 30)} months ago`;
-    return `Added ${Math.floor(diffInDays / 365)} years ago`;
-  };
 
   return (
     <div className="min-h-screen bg-black">
@@ -387,7 +376,7 @@ export default function SolutionsPage() {
                         <span className={`inline-flex items-center rounded bg-${getLanguageColor(solution.language)}/10 px-2 py-1 text-xs font-medium text-${getLanguageColor(solution.language)} ring-1 ring-inset ring-${getLanguageColor(solution.language)}/20 capitalize`}>
                           {solution.language}
                         </span>
-                        <span className="text-xs text-white/40">{formatDate(solution.created_at)}</span>
+                        <span className="text-xs text-white/40">{formatDateIST(solution.created_at)}</span>
                       </div>
                     </article>
                   </Link>

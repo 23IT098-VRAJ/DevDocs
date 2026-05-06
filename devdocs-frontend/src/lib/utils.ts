@@ -35,24 +35,40 @@ export function cn(...inputs: ClassValue[]): string {
 // DATE & TIME UTILITIES
 // ============================================================================
 
+/** IST timezone identifier — all dates and times are shown in India Standard Time (UTC+5:30) */
+const IST = 'Asia/Kolkata';
+
 /**
- * Format ISO date string to human-readable format
- * @param dateString - ISO 8601 date string (e.g., "2024-12-28T15:30:00Z")
+ * Parse a date string from the backend safely.
+ * Backend stores TIMESTAMP WITHOUT TIME ZONE (UTC). Strings without a 'Z'
+ * suffix are treated as LOCAL time by JavaScript, which is wrong.
+ * This helper appends 'Z' when missing so the value is always interpreted as UTC.
+ */
+function parseUTCDate(dateString: string): Date {
+  // If already has timezone info (Z or +xx:xx), parse as-is
+  if (/Z$|[+-]\d{2}:\d{2}$/.test(dateString)) return new Date(dateString);
+  // Append Z to treat as UTC
+  return new Date(dateString + 'Z');
+}
+
+/**
+ * Format ISO date string to human-readable format in IST (India Standard Time)
+ * @param dateString - ISO 8601 date string from the backend
  * @param format - Format type from DATE_FORMATS
- * @returns Formatted date string
- * 
+ * @returns Formatted date string in IST
+ *
  * @example
- * formatDate('2024-12-28T15:30:00Z', 'SHORT') 
- * // => 'Dec 28, 2024'
+ * formatDate('2024-12-28T15:30:00Z', 'SHORT')
+ * // => 'Dec 28, 2024' (in IST)
  */
 export function formatDate(
   dateString: string,
   format: keyof typeof DATE_FORMATS = 'SHORT'
 ): string {
   try {
-    const date = new Date(dateString);
-    const options = DATE_FORMATS[format] as Intl.DateTimeFormatOptions;
-    return new Intl.DateTimeFormat('en-US', options).format(date);
+    const date = parseUTCDate(dateString);
+    const options = { ...(DATE_FORMATS[format] as Intl.DateTimeFormatOptions), timeZone: IST };
+    return new Intl.DateTimeFormat('en-IN', options).format(date);
   } catch (error) {
     console.error('Invalid date string:', dateString);
     return 'Invalid date';
@@ -60,18 +76,18 @@ export function formatDate(
 }
 
 /**
- * Get relative time string (e.g., "2 hours ago", "3 days ago")
- * @param dateString - ISO 8601 date string
- * @returns Relative time string
- * 
+ * Get relative time string in IST context (e.g., "2 hours ago", "3 days ago")
+ * @param dateString - ISO 8601 date string from the backend
+ * @returns Relative time string based on current IST time
+ *
  * @example
- * getRelativeTime('2024-12-28T15:30:00Z') 
- * // => '2 hours ago' (if current time is 17:30)
+ * getRelativeTime('2024-12-28T15:30:00Z')
+ * // => '2 hours ago'
  */
 export function getRelativeTime(dateString: string): string {
   try {
-    const date = new Date(dateString);
-    const now = new Date();
+    const date = parseUTCDate(dateString);
+    const now = new Date(); // always UTC-based in JS regardless of locale
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
@@ -94,6 +110,22 @@ export function getRelativeTime(dateString: string): string {
   } catch (error) {
     console.error('Invalid date string:', dateString);
     return 'Unknown';
+  }
+}
+
+/**
+ * Format an ISO date string to a short IST date string (e.g., "6/5/2026")
+ * Convenience wrapper used by inline date displays across the app.
+ */
+export function formatDateIST(dateString: string): string {
+  try {
+    const date = parseUTCDate(dateString);
+    return new Intl.DateTimeFormat('en-IN', {
+      day: 'numeric', month: 'numeric', year: 'numeric',
+      timeZone: IST,
+    }).format(date);
+  } catch {
+    return 'Invalid date';
   }
 }
 

@@ -37,8 +37,8 @@ class Settings(BaseSettings):
     SUPABASE_KEY: str = ""  # Optional API key
     
     # AI/ML Settings
-    EMBEDDING_MODEL: str = "sentence-transformers/all-mpnet-base-v2"
-    EMBEDDING_DIMENSION: int = 768  # all-mpnet-base-v2 uses 768 dimensions
+    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+    EMBEDDING_DIMENSION: int = 384  # all-MiniLM-L6-v2 uses 384 dimensions
     MODEL_CACHE_DIR: str = str(Path.home() / ".cache" / "devdocs" / "models")
     
     # Supported Programming Languages
@@ -51,6 +51,7 @@ class Settings(BaseSettings):
 
     # Gemini AI — for answer generation and smart tagging
     GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
 
     # Logging
     LOG_LEVEL: str = "INFO"

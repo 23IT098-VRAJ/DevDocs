@@ -34,6 +34,11 @@ class SearchRequest(BaseModel):
     min_similarity: float = Field(0.3, ge=0.0, le=1.0)
 
 
+class ExplainSolutionRequest(BaseModel):
+    """Request to explain a single solution"""
+    solution_id: str = Field(..., description="Solution ID to explain")
+
+
 # ============================================================================
 # POST /api/search - Semantic Search
 # ============================================================================
@@ -223,6 +228,68 @@ async def ai_answer(
 
     async def stream():
         async for chunk in gemini.generate_answer_stream(search_request.query, results):
+            yield chunk
+
+    return StreamingResponse(stream(), media_type="text/plain; charset=utf-8")
+
+
+# ============================================================================
+# POST /api/search/explain-solution  —  Explain a single solution (streaming)
+# ============================================================================
+
+@router.post("/search/explain-solution")
+async def explain_solution(
+    request_body: ExplainSolutionRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+):
+    """
+    Stream a Gemini-generated explanation for a specific solution.
+    Provides concise explanation of how the problem was solved.
+    Response is plain text streamed token-by-token.
+    """
+    from app.services import gemini
+
+    if not gemini.is_available():
+        raise HTTPException(
+            status_code=503,
+            detail="AI explanations unavailable — GEMINI_API_KEY not configured",
+        )
+
+    user = await get_or_create_user(current_user, db)
+
+    # Fetch the specific solution
+    solution_query = text("""
+        SELECT id, title, description, code, language, tags
+        FROM solutions
+        WHERE id = :solution_id
+          AND user_id = :user_id
+          AND is_archived = FALSE
+    """)
+
+    result = await db.execute(
+        solution_query,
+        {
+            "solution_id": request_body.solution_id,
+            "user_id": str(user.id),
+        }
+    )
+    row = result.fetchone()
+
+    if not row:
+        raise HTTPException(status_code=404, detail="Solution not found")
+
+    # Prepare solution data for explanation
+    solution = {
+        "title": row.title,
+        "description": row.description,
+        "code": row.code,
+        "language": row.language,
+        "tags": row.tags or [],
+    }
+
+    async def stream():
+        async for chunk in gemini.explain_solution_stream(solution):
             yield chunk
 
     return StreamingResponse(stream(), media_type="text/plain; charset=utf-8")

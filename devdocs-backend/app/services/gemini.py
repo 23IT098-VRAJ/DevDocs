@@ -25,7 +25,7 @@ def init_gemini() -> None:
     try:
         from google import genai  # type: ignore
         _client = genai.Client(api_key=settings.GEMINI_API_KEY)
-        logger.info("✅ Gemini 2.0 Flash ready (google-genai SDK)")
+        logger.info(f"✅ Gemini ready (google-genai SDK, model={settings.GEMINI_MODEL})")
     except Exception as e:
         logger.error(f"❌ Gemini init failed: {e}")
         _client = None
@@ -35,7 +35,24 @@ def is_available() -> bool:
     return _client is not None
 
 
-_MODEL = "gemini-2.0-flash"
+_FALLBACK_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+]
+
+
+def _candidate_models() -> List[str]:
+    """Return configured model followed by known fallbacks (deduplicated)."""
+    preferred = (settings.GEMINI_MODEL or "").strip()
+    ordered = [preferred, *_FALLBACK_MODELS]
+    seen = set()
+    models: List[str] = []
+    for model in ordered:
+        if model and model not in seen:
+            models.append(model)
+            seen.add(model)
+    return models
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -93,13 +110,102 @@ Answer the query concisely and technically:
 
 Do not hallucinate code — only reference what is shown above."""
 
-    try:
-        async for chunk in await _client.aio.models.generate_content_stream(  # type: ignore
-            model=_MODEL,
-            contents=prompt,
-        ):
-            if chunk.text:
-                yield chunk.text
-    except Exception as e:
-        logger.error(f"Gemini answer stream failed: {e}")
-        yield f"\n\n_AI answer unavailable: {e}_"
+    last_error: Exception | None = None
+
+    for model_name in _candidate_models():
+        try:
+            async for chunk in await _client.aio.models.generate_content_stream(  # type: ignore
+                model=model_name,
+                contents=prompt,
+            ):
+                if chunk.text:
+                    yield chunk.text
+
+            # Stream completed successfully, stop trying fallbacks.
+            return
+        except Exception as e:
+            last_error = e
+            msg = str(e)
+            if "404" in msg or "NOT_FOUND" in msg:
+                logger.warning(f"Gemini model unavailable ({model_name}); trying fallback")
+                continue
+            logger.error(f"Gemini answer stream failed with model {model_name}: {e}")
+            continue
+
+    if last_error is not None:
+        logger.error(f"Gemini answer stream failed after all model attempts: {last_error}")
+        yield f"\n\n_AI answer unavailable: {last_error}_"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Solution Explanation (Streaming)
+# ─────────────────────────────────────────────────────────────────────────────
+
+async def explain_solution_stream(
+    solution: dict,
+) -> AsyncIterator[str]:
+    """
+    Stream a simple, concise explanation of how a specific solution works.
+    Focuses on: what problem it solves, how the code works, and key techniques.
+    """
+    if _client is None:
+        yield "_Explanations are unavailable (GEMINI_API_KEY not configured)._"
+        return
+
+    title = solution.get("title", "Untitled")
+    description = solution.get("description", "")
+    code = solution.get("code", "")
+    language = solution.get("language", "")
+    tags = solution.get("tags", [])
+
+    tags_str = ", ".join(tags) or "—"
+    
+    prompt = f"""You are DevDocs Explainer — a code explanation assistant.
+
+**Solution:** {title}
+**Language:** {language}
+**Tags:** {tags_str}
+
+**Problem Description:**
+{description}
+
+**Code Implementation:**
+```{language}
+{code}
+```
+
+---
+
+Provide a **simple and concise** explanation (2-3 short paragraphs):
+1. What problem does this solution solve?
+2. How does the code solve it? (explain key steps/techniques)
+3. What are the main patterns or gotchas to remember?
+
+Use markdown for clarity (bold for key terms, inline code for variables/functions).
+Keep language simple and avoid unnecessary jargon."""
+
+    last_error: Exception | None = None
+
+    for model_name in _candidate_models():
+        try:
+            async for chunk in await _client.aio.models.generate_content_stream(  # type: ignore
+                model=model_name,
+                contents=prompt,
+            ):
+                if chunk.text:
+                    yield chunk.text
+
+            # Stream completed successfully, stop trying fallbacks.
+            return
+        except Exception as e:
+            last_error = e
+            msg = str(e)
+            if "404" in msg or "NOT_FOUND" in msg:
+                logger.warning(f"Gemini model unavailable ({model_name}); trying fallback")
+                continue
+            logger.error(f"Gemini explanation stream failed with model {model_name}: {e}")
+            continue
+
+    if last_error is not None:
+        logger.error(f"Gemini explanation stream failed after all model attempts: {last_error}")
+        yield f"\n\n_Explanation unavailable: {last_error}_"

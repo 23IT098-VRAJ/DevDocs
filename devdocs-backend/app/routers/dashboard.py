@@ -184,8 +184,8 @@ async def get_weekly_activity(
         activity_query = text("""
             WITH dates AS (
                 SELECT generate_series(
-                    CURRENT_DATE - INTERVAL '6 days',
-                    CURRENT_DATE,
+                    (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')::date - INTERVAL '6 days',
+                    (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')::date,
                     '1 day'::interval
                 )::date AS day
             )
@@ -193,7 +193,7 @@ async def get_weekly_activity(
                 d.day,
                 COUNT(s.id) as count
             FROM dates d
-            LEFT JOIN solutions s ON DATE(s.created_at) = d.day 
+            LEFT JOIN solutions s ON (s.created_at AT TIME ZONE 'Asia/Kolkata')::date = d.day
                 AND s.user_id = :user_id 
                 AND s.is_archived = FALSE
             GROUP BY d.day

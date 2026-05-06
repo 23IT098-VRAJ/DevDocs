@@ -1,3 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 # FastAPI and ASGI server
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
@@ -12,7 +14,7 @@ alembic==1.13.1
 
 # AI/ML - Embeddings
 sentence-transformers==2.3.1
-torch>=2.6.0
+torch>=2.6.0+cpu
 transformers==4.37.2
 
 # Vector similarity (pgvector client)
@@ -24,7 +26,7 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 slowapi==0.1.9
 
-# AI Answer Generation + Smart Tagging (Gemini 2.0 Flash)
+# AI Answer Generation + Smart Tagging (Gemini)
 google-genai>=1.0.0
 
 # Utilities

@@ -13,6 +13,7 @@
 import { useQuery, useMutation, useQueryClient, type UseQueryResult, type UseMutationResult } from '@tanstack/react-query';
 import { solutionsApi } from '@/lib/api';
 import type { Solution, SolutionCreate, SolutionUpdate } from '@/lib/types';
+import { dashboardKeys } from '@/hooks/useDashboard';
 
 // ============================================================================
 // QUERY KEYS
@@ -110,6 +111,8 @@ export function useCreateSolution(): UseMutationResult<Solution, Error, Solution
     onSuccess: () => {
       // Invalidate solutions list to refetch with new solution
       queryClient.invalidateQueries({ queryKey: solutionKeys.lists() });
+      // Invalidate all dashboard queries so stats and weekly activity chart update immediately
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
     },
   });
 }
@@ -186,6 +189,8 @@ export function useDeleteSolution(): UseMutationResult<void, Error, string> {
       queryClient.removeQueries({ queryKey: solutionKeys.detail(id) });
       // Invalidate solutions list to remove deleted item
       queryClient.invalidateQueries({ queryKey: solutionKeys.lists() });
+      // Invalidate all dashboard queries so stats and weekly activity chart update immediately
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
     },
   });
 }

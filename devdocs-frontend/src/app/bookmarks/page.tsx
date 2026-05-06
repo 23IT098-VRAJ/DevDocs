@@ -8,6 +8,7 @@ import { GlassmorphicFooter } from '@/components/layout/GlassmorphicFooter';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { bookmarksApi, solutionsApi } from '@/lib/api';
 import type { Solution } from '@/lib/types';
+import { formatDateIST } from '@/lib/utils';
 
 export default function BookmarksPage() {
   const { loading } = useRequireAuth();
@@ -262,7 +263,7 @@ export default function BookmarksPage() {
                       {/* Date */}
                       <div className="flex items-center gap-1.5 text-white/40 text-xs">
                         <Calendar size={14} />
-                        <span>{new Date(solution.created_at).toLocaleDateString()}</span>
+                        <span>{formatDateIST(solution.created_at)}</span>
                       </div>
                     </div>
                   </article>

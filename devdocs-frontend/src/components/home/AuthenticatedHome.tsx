@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useDashboard } from '@/hooks/useDashboard';
 import { useRouter } from 'next/navigation';
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout';
+import { formatDateIST } from '@/lib/utils';
 
 export default function AuthenticatedHome() {
   const { user } = useAuth();
@@ -65,36 +66,59 @@ export default function AuthenticatedHome() {
               {/* Enhanced Weekly Activity Chart */}
               <div className="flex-1 flex flex-col justify-end mt-6">
                 <p className="text-xs text-slate-400 mb-3 font-medium uppercase tracking-wider">Last 7 Days Activity</p>
-                <div className="flex items-end gap-2 h-32">
+
+                {/* BAR ROW — bars are DIRECT children of this fixed-height flex container
+                    so height:X% resolves against the explicit h-24 (96px) correctly */}
+                <div className="flex items-end gap-1.5 h-24 w-full">
                   {(weeklyActivity || [0, 0, 0, 0, 0, 0, 0]).map((count, i) => {
-                    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                    const maxCount = Math.max(...(weeklyActivity || [1]), 1);
-                    const heightPercent = maxCount > 0 ? Math.max((count / maxCount) * 100, 8) : 8;
-                    
+                    const maxCount = Math.max(...(weeklyActivity || [0]), 1);
+                    const heightPercent = count > 0
+                      ? Math.max(Math.round((count / maxCount) * 100), 12)
+                      : 5; // ghost bar for empty days
+
                     return (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                        <div 
-                          className="w-full bg-linear-to-t from-[#07b9d5] to-cyan-400 rounded-t-lg relative group/bar transition-all duration-500 hover:from-[#07b9d5] hover:to-[#3ae0ff] cursor-pointer"
-                          style={{
-                            height: `${heightPercent}%`,
-                            transitionDelay: `${i * 50}ms`,
-                            boxShadow: count > 0 ? '0 0 20px rgba(7, 185, 213, 0.3)' : 'none',
-                          }}
-                        >
-                          {/* Count Label */}
-                          {count > 0 && (
-                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-[#07b9d5] opacity-0 group-hover/bar:opacity-100 transition-opacity">
-                              {count}
-                            </div>
-                          )}
-                          
-                          {/* Tooltip */}
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl z-10">
-                            {count} solution{count !== 1 ? 's' : ''}
-                          </div>
+                      <div
+                        key={i}
+                        className="relative flex-1 rounded-t-md cursor-pointer group/bar transition-all duration-500"
+                        style={{
+                          height: `${heightPercent}%`,
+                          background: count > 0
+                            ? 'linear-gradient(to top, #07b9d5, #3ae0ff)'
+                            : 'rgba(255,255,255,0.06)',
+                          boxShadow: count > 0 ? '0 0 16px rgba(7,185,213,0.35)' : 'none',
+                          transitionDelay: `${i * 40}ms`,
+                        }}
+                      >
+                        {/* Hover count label */}
+                        {count > 0 && (
+                          <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-[#07b9d5] opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap">
+                            {count}
+                          </span>
+                        )}
+                        {/* Tooltip */}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl z-10">
+                          {count} solution{count !== 1 ? 's' : ''}
                         </div>
-                        <span className="text-[10px] text-slate-500 font-medium">{days[i]}</span>
                       </div>
+                    );
+                  })}
+                </div>
+
+                {/* LABEL ROW — separate from bars so they don't affect bar height calculations */}
+                <div className="flex gap-1.5 mt-1.5">
+                  {(weeklyActivity || [0, 0, 0, 0, 0, 0, 0]).map((_, i) => {
+                    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    const today = new Date();
+                    const barDate = new Date(today);
+                    barDate.setDate(today.getDate() - (6 - i));
+                    const label = i === 6 ? 'Today' : dayNames[barDate.getDay()];
+                    return (
+                      <span
+                        key={i}
+                        className={`flex-1 text-center text-[9px] font-medium truncate ${i === 6 ? 'text-[#07b9d5]' : 'text-slate-500'}`}
+                      >
+                        {label}
+                      </span>
                     );
                   })}
                 </div>
@@ -284,7 +308,7 @@ export default function AuthenticatedHome() {
                             {solution.language}
                           </span>
                           <span className="text-xs text-slate-500">
-                            {solution.language} • Updated {new Date(solution.updated_at).toLocaleDateString()}
+                            {solution.language} • Updated {formatDateIST(solution.updated_at)}
                           </span>
                         </div>
                       </div>

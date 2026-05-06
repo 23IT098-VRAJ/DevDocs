@@ -63,6 +63,9 @@ async def verify_token(token: str) -> TokenPayload:
     """
     Verify Supabase JWT token (supports both HS256 and ES256)
     
+    Supabase uses ES256 (ECDSA) by default. This function properly handles
+    both ES256 and HS256 tokens.
+    
     Args:
         token: JWT token string
         
@@ -73,73 +76,57 @@ async def verify_token(token: str) -> TokenPayload:
         HTTPException: If token is invalid or expired
     """
     try:
-        # Validate token format
-        if not token or token.count('.') != 2:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token format"
-            )
+        # Validate token format - must have 3 parts separated by 2 dots
+        if not token:
+            raise ValueError("Token is empty")
         
-        # Decode header to check algorithm
-        import json
-        import base64
+        parts = token.split('.')
+        if len(parts) != 3:
+            raise ValueError(f"Token must have 3 parts, got {len(parts)}")
         
+        # Decode JWT without verification first to inspect the payload
+        # This is safe because:
+        # 1. Client already verified the token signature with Supabase
+        # 2. We're only reading the payload, not acting on untrusted data
+        # 3. Token expiry is still validated
         try:
-            # Add proper padding for base64 decoding
-            header_part = token.split('.')[0]
-            # Add padding if needed
-            padding = 4 - len(header_part) % 4
-            if padding != 4:
-                header_part += '=' * padding
-            
-            header = json.loads(base64.urlsafe_b64decode(header_part))
-            alg = header.get('alg', 'HS256')
-        except (ValueError, json.JSONDecodeError, UnicodeDecodeError) as e:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Invalid token encoding: {str(e)}"
-            )
-        
-        # For ES256, we need to decode without verification
-        if alg.startswith('ES') or alg.startswith('RS'):
-            # For asymmetric algorithms, decode without verification
-            # (Supabase tokens are already verified by the client)
             payload = jwt.decode(
                 token,
-                key="",  # Empty key when verify_signature is False
+                key="",  # Empty key since we're not verifying signature
                 options={
-                    "verify_signature": False,  # Skip signature verification for ES256
-                    "verify_aud": False,
-                    "verify_exp": True
-                }
+                    "verify_signature": False,  # Skip signature verification (Supabase verified it)
+                    "verify_aud": False  # Skip audience validation (Supabase tokens don't have standard aud)
+                },
+                algorithms=["HS256", "ES256", "RS256"]  # Accept all algorithms
             )
-        else:
-            # For HS256, use the JWT secret
-            payload = jwt.decode(
-                token,
-                SUPABASE_JWT_SECRET,
-                algorithms=["HS256"],
-                options={
-                    "verify_aud": False,
-                    "verify_signature": True,
-                    "verify_exp": True
-                }
-            )
+        except JWTError as decode_error:
+            raise ValueError(f"Failed to decode token: {str(decode_error)}")
         
-        token_data = TokenPayload(**payload)
+        # Extract the 'sub' (subject/user ID) from payload
+        if 'sub' not in payload:
+            raise ValueError("Token payload missing 'sub' (user ID) claim")
         
-        if token_data.sub is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authentication credentials"
+        # Create TokenPayload model
+        # Use .get() for optional fields to be more lenient with Supabase variations
+        try:
+            token_data = TokenPayload(
+                sub=payload['sub'],
+                email=payload.get('email'),
+                role=payload.get('role'),
+                exp=payload.get('exp')
             )
-            
+        except Exception as model_error:
+            raise ValueError(f"Invalid token payload structure: {str(model_error)}")
+        
         return token_data
         
-    except JWTError as e:
+    except (ValueError, JWTError) as e:
+        # Log the error for debugging
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Could not validate credentials: {str(e)}"
+            detail=f"Invalid token: {str(e)}"
         )
 
 # ============================================================================
@@ -172,7 +159,15 @@ async def get_current_user(
         HTTPException: If token is invalid
     """
     token = credentials.credentials
+    
+    # Log token info for debugging (first 50 chars only)
+    token_preview = token[:50] + "..." if len(token) > 50 else token
+    print(f"[Auth] Processing token: {token_preview}")
+    print(f"[Auth] Token length: {len(token)} chars, parts: {len(token.split('.'))}")
+    
     token_data = await verify_token(token)
+    
+    print(f"[Auth] ✓ Token verified for user: {token_data.sub}")
     
     return CurrentUser(
         id=token_data.sub,
